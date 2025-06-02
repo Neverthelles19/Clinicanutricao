@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 02/06/2025 às 17:05
+-- Tempo de geração: 02/06/2025 às 21:29
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -59,6 +59,13 @@ CREATE TABLE `agendamentos` (
   `telefone_cliente` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `agendamentos`
+--
+
+INSERT INTO `agendamentos` (`id`, `profissional_id`, `servico_id`, `cliente_id`, `data`, `hora`, `status`, `nome_cliente`, `email_cliente`, `telefone_cliente`) VALUES
+(7, 4, 1, 1, '2025-06-10', '14:30:00', 'confirmado', 'Amanda Mesquita De Farias', 'amandamesquita818@gmail.com', '(12) 97812-7295');
+
 -- --------------------------------------------------------
 
 --
@@ -78,7 +85,7 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id`, `nome`, `email`, `telefone`, `senha`) VALUES
-(1, 'Amanda Mesquita De Farias', '', '(12) 97812-7295', '$2y$10$LnGKesEk10s/DW/Zaq2qN.xt2cDZ5MLMzFaTrkfrxZTi6kicHPcKK');
+(1, 'Amanda Mesquita De Farias', 'amandamesquita818@gmail.com', '(12) 97812-7295', '$2y$10$LnGKesEk10s/DW/Zaq2qN.xt2cDZ5MLMzFaTrkfrxZTi6kicHPcKK');
 
 -- --------------------------------------------------------
 
@@ -186,7 +193,7 @@ ALTER TABLE `adm`
 -- AUTO_INCREMENT de tabela `agendamentos`
 --
 ALTER TABLE `agendamentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de tabela `clientes`
