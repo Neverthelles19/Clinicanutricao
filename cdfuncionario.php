@@ -109,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     .card-header {
-      background: linear-gradient(135deg, #9600ff, #0050ff);
+      background: linear-gradient(135deg, #9600ff, #0f3fa8);
       color: white;
       padding: 25px;
       border-bottom: none;
@@ -166,6 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       letter-spacing: 0.5px;
       transition: var(--transition);
       box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      margin: 30px;
     }
     
     .btn-primary:hover {
@@ -493,14 +494,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label class="form-label">Hora de Início</label>
                     <div class="input-icon-wrapper">
                       <input type="time" name="hora_inicio" class="form-control icon-input" required>
-                      <i class="far fa-clock input-icon"></i>
+                      
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Hora de Fim</label>
                     <div class="input-icon-wrapper">
                       <input type="time" name="hora_fim" class="form-control icon-input" required>
-                      <i class="far fa-clock input-icon"></i>
+                      
                     </div>
                   </div>
                 </div>
@@ -508,6 +509,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
         </div>
+
+        
 
         <div class="text-center mt-5">
           <button type="submit" class="btn btn-primary btn-animated px-5 py-3">

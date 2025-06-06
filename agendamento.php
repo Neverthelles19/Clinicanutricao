@@ -128,7 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Agendamento de Serviços</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="styleUser.css" rel="stylesheet" />
+<link href="stylecadastroUser.css" rel="stylesheet" />
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* Estilos do calendário */
 .calendario-table {
   width: 100%;
@@ -180,40 +184,286 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 #modalAgendamento .modal-body > div:first-child {
     margin-bottom: 20px;
 }
+
+.card {
+  border-left: 4px solid #0d6efd; /* Azul Bootstrap */
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.agendarBtn {
+  border: 2px solid #0d6efd;
+  color: #0d6efd;
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.agendarBtn:hover {
+  background-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.25);
+}
+
+/*Estilos dos pedidos*/
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+
+  h2 {
+    font-weight: 600;
+  }
+
+  .card {
+    border: none;
+    border-left: 4px solid #0d6efd; /* Azul Bootstrap */
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .btn.agendarBtn {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn.agendarBtn:hover {
+    background-color: #084298;
+    transform: translateY(-2px);
+  }
+
+  p.text-muted {
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 1rem;
+    }
+    .btn.agendarBtn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+
+
 </style>
 </head>
 <body class="bg-light">
+    <section class="bg-light py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-md-6">
+        <img src="clinica.jpg" alt="Imagem da Clínica de Nutrição" class="img-fluid rounded shadow">
+      </div>
+      <div class="col-md-6">
+        <h2 class="mb-3 text-primary">Sobre a Nossa Clínica</h2>
+        <p class="lead">Cuidar da sua saúde é a nossa prioridade.</p>
+        <p>
+          Fundada com o compromisso de promover o bem-estar e a qualidade de vida, nossa clínica oferece serviços personalizados de nutrição para todas as idades. Contamos com profissionais qualificados, atendimento humanizado e estrutura moderna.
+        </p>
+        <p>
+          Venha conhecer e descubra como podemos te ajudar a alcançar seus objetivos com saúde e equilíbrio!
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="py-5 bg-light">
+  <div class="container" style="max-width: 1320px;">
+    <div class="d-flex gap-4" style="justify-content: flex-start;">
+
+      <!-- Quadrado maior: Informações -->
+      <div class="info-quadrado bg-white border rounded shadow p-5" 
+           style="flex: 0 0 600px; min-height: 520px;">
+
+        <h3 class="text-primary mb-4" style="font-weight: 700; font-size: 2.2rem; border-bottom: 3px solid #0d6efd; padding-bottom: 0.3rem;">
+          Informações da Clínica
+        </h3>
+
+        <div class="mb-4">
+          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">📍 Localização</h5>
+          <p style="font-size: 1.15rem; margin-bottom: 0.4rem; line-height: 1.4;">
+            Rua Nutrição, 123, Bairro Saúde, Cidade - Estado
+          </p>
+          <a href="https://www.google.com/maps/search/clinica+nutri%C3%A7%C3%A3o/@-23.3095128,-45.9872362,14z?entry=ttu&g_ep=EgoyMDI1MDYwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" 
+             class="btn btn-outline-primary btn-sm px-3" style="font-weight: 600;">
+            Ver no Google Maps 🔗
+          </a>
+        </div>
+
+        <div class="mb-4">
+          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">⏰ Horários de Funcionamento</h5>
+          <ul class="list-unstyled" style="font-size: 1.15rem; line-height: 1.5;">
+            <li>Segunda a Sexta: 08h00 - 18h00</li>
+            <li>Sábado: 09h00 - 13h00</li>
+            <li>Domingo: Fechado</li>
+          </ul>
+        </div>
+
+        <div class="mb-4">
+          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">💳 Formas de Pagamento</h5>
+          <p style="font-size: 1.15rem; line-height: 1.4;">
+            Aceitamos cartão de crédito, débito, Pix e dinheiro.
+          </p>
+        </div>
+
+        <div>
+          <h5 class="fw-bold text-secondary mb-3" style="font-size: 1.3rem;">🔗 Redes Sociais</h5>
+          <div class="d-flex flex-column gap-2">
+            <a href="https://instagram.com/clinicanutricao" target="_blank" 
+               class="text-decoration-none text-primary fw-semibold fs-5">
+              📷 Instagram
+            </a>
+            <a href="https://facebook.com/clinicanutricao" target="_blank" 
+               class="text-decoration-none text-primary fw-semibold fs-5">
+              👍 Facebook
+            </a>
+            <a href="https://twitter.com/clinicanutricao" target="_blank" 
+               class="text-decoration-none text-primary fw-semibold fs-5">
+              🐦 Twitter
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caixas menores: Comodidades -->
+      <div class="comodidades-quadrados d-grid gap-3" 
+           style="flex: 0 0 320px; grid-template-columns: repeat(2, 1fr);">
+
+        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
+          <div class="fs-3 mb-2">🅿️</div>
+          <h6 class="fw-semibold mb-1">Estacionamento</h6>
+          <p class="text-muted small mb-0">Gratuito no local</p>
+        </div>
+
+        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
+          <div class="fs-3 mb-2">📶</div>
+          <h6 class="fw-semibold mb-1">Wi-Fi</h6>
+          <p class="text-muted small mb-0">Internet rápida e gratuita</p>
+        </div>
+
+        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
+          <div class="fs-3 mb-2">🧒</div>
+          <h6 class="fw-semibold mb-1">Atende Crianças</h6>
+          <p class="text-muted small mb-0">Ambiente acolhedor para crianças</p>
+        </div>
+
+        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
+          <div class="fs-3 mb-2">♿</div>
+          <h6 class="fw-semibold mb-1">Acessibilidade</h6>
+          <p class="text-muted small mb-0">Estrutura adaptada para todos</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .comodidade-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  @media (max-width: 991px) {
+    .container > div.d-flex {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    .info-quadrado, .comodidades-quadrados {
+      flex: 1 1 100% !important;
+      max-width: 100% !important;
+      min-height: auto !important;
+      margin-bottom: 2rem;
+    }
+    .comodidades-quadrados {
+      grid-template-columns: 1fr !important;
+    }
+    .comodidade-card {
+      font-size: 1rem !important;
+      width: 100% !important;
+    }
+  }
+
+  .p-3 {
+        padding: 80px !important;
+  }
+</style>
+
+
+
+
+
+
 <div class="container py-5">
-<h2 class="mb-4 text-center">Agendamento de Serviços de Nutrição</h2>
-<p class="text-center lead">Selecione o serviço desejado para iniciar seu agendamento.</p>
-<div class="row justify-content-center">
+  <h2 class="mb-4 text-start">Agendamento de Serviços de Nutrição</h2>
+  <p class="text-start lead">Selecione o serviço desejado para iniciar seu agendamento.</p>
+
+  <div class="d-flex flex-column gap-4 align-items-start" style="max-width: 700px;">
     <?php
-    // Verifica se há serviços para exibir
     if (mysqli_num_rows($servicos) > 0) {
         while($s = mysqli_fetch_assoc($servicos)): ?>
-        <div class="col-md-4 col-sm-6 mb-4">
-          <div class="card shadow h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title text-primary text-center"><?= htmlspecialchars($s['servico']) ?></h5>
-              <p class="card-text flex-grow-1 text-center">
-                Duração: **<?= intval($s['duracao']) ?> min**<br>
-                Valor: **R$ <?= number_format($s['valor'], 2, ',', '.') ?>**
-              </p>
-              <button class="btn btn-primary mt-auto agendarBtn w-100"
-                      data-id="<?= $s['id'] ?>"
-                      data-servico="<?= htmlspecialchars($s['servico']) ?>">
-                Agendar Agora
-              </button>
+        <div class="w-100">
+          <div class="card shadow-sm border-start border-4 border-primary">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between text-start gap-3">
+              <div>
+                <h5 class="mb-2 text-primary"><?= htmlspecialchars($s['servico']) ?></h5>
+                <p class="mb-0 text-muted">
+                  <strong>Duração:</strong> <?= intval($s['duracao']) ?> min<br>
+                  <strong>Valor:</strong> R$ <?= number_format($s['valor'], 2, ',', '.') ?>
+                </p>
+              </div>
+              <div class="mt-3 mt-md-0">
+                <button class="btn btn-outline-primary agendarBtn"
+                        data-id="<?= $s['id'] ?>"
+                        data-servico="<?= htmlspecialchars($s['servico']) ?>">
+                  Agendar Agora
+                </button>
+              </div>
             </div>
           </div>
         </div>
         <?php endwhile;
     } else {
-        echo "<p class='text-center'>Nenhum serviço disponível no momento.</p>";
+        echo "<p class='text-start'>Nenhum serviço disponível no momento.</p>";
     }
     ?>
+  </div>
 </div>
-</div>
+
+
 
 <div class="modal fade" id="modalAgendamento" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -269,71 +519,175 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirme seu Agendamento</h5>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-sm rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Confirme seu Agendamento</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
-      <div class="modal-body">
-        <p>Serviço: <strong id="confirmServico" class="text-primary"></strong></p>
-        <p>Profissional: <strong id="confirmProfissional" class="text-success"></strong></p>
-        <p>Data: <strong id="confirmData" class="text-info"></strong></p>
+      
+      <div class="modal-body pt-2">
+        <ul class="list-unstyled mb-4">
+          <li class="mb-3">
+            <span class="text-muted small">Serviço</span><br>
+            <span id="confirmServico" class="fw-semibold text-dark"></span>
+          </li>
+          <li class="mb-3">
+            <span class="text-muted small">Profissional</span><br>
+            <span id="confirmProfissional" class="fw-semibold text-dark"></span>
+          </li>
+          <li>
+            <span class="text-muted small">Data</span><br>
+            <span id="confirmData" class="fw-semibold text-dark"></span>
+          </li>
+        </ul>
 
         <div class="mb-3">
-          <label for="selectHora" class="form-label fw-bold">Escolha o horário:</label>
+          <label for="selectHora" class="form-label fw-semibold">Escolha o horário:</label>
           <select id="selectHora" class="form-select" style="max-width: 200px;">
             <option value="">Selecione um horário</option>
           </select>
         </div>
 
-        <form method="POST" id="formAgendamento" style="display:none;" class="mt-4 p-3 border rounded bg-light">
-            <input type="hidden" name="servico_id" id="inputServicoId" />
-            <input type="hidden" name="profissional_id" id="inputProfissionalId" />
-            <input type="hidden" name="data" id="inputData" />
-            <input type="hidden" name="hora" id="inputHora" />
-
-            <div id="formCadastro">
-                <h6 class="mb-3 text-center">Crie sua conta para agendar:</h6>
-                <div class="mb-3">
-                    <label for="nome_cliente_cadastro" class="form-label">Seu Nome Completo:</label>
-                    <input type="text" class="form-control" name="nome_cliente" id="nome_cliente_cadastro" placeholder="Nome Sobrenome" />
-                </div>
-                <div class="mb-3">
-                    <label for="email_cliente_cadastro" class="form-label">E-mail:</label>
-                    <input type="email" class="form-control" name="email_cliente" id="email_cliente_cadastro" placeholder="seu.email@exemplo.com" />
-                </div>
-                <div class="mb-3">
-                    <label for="telefone_cliente_cadastro" class="form-label">Telefone (com DDD):</label>
-                    <input type="tel" class="form-control" name="telefone_cliente" id="telefone_cliente_cadastro" placeholder="(XX) XXXXX-XXXX" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Formato: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX" />
-                </div>
-                <div class="mb-3">
-                    <label for="senha_cadastro" class="form-label">Crie sua Senha:</label>
-                    <input type="password" class="form-control" name="senha" id="senha_cadastro" placeholder="Mínimo 6 caracteres" />
-                </div>
-                <p class="text-center">
-                    Já tem cadastro? <a href="#" id="linkFazerLogin">Faça Login</a>
-                </p>
-            </div>
-
-            <div id="formLogin" style="display:none;">
-                <h6 class="mb-3 text-center">Acesse sua conta:</h6>
-                <div class="mb-3">
-                    <label for="email_cliente_login" class="form-label">E-mail:</label>
-                    <input type="email" class="form-control" name="email_cliente" id="email_cliente_login" placeholder="seu.email@exemplo.com" />
-                </div>
-                <div class="mb-3">
-                    <label for="senha_login" class="form-label">Senha:</label>
-                    <input type="password" class="form-control" name="senha" id="senha_login" placeholder="Sua senha" />
-                </div>
-                <p class="text-center">
-                    Não tem cadastro? <a href="#" id="linkFazerCadastro">Crie sua conta</a>
-                </p>
-            </div>
-
-            <button type="submit" class="btn btn-success w-100 mt-3" id="btnConfirmarAgendamento">Confirmar Agendamento</button>
+        <form method="POST" id="formAgendamento" style="display: none;">
+          <input type="hidden" name="servico_id" id="inputServicoId" />
+          <input type="hidden" name="profissional_id" id="inputProfissionalId" />
+          <input type="hidden" name="data" id="inputData" />
+          <input type="hidden" name="hora" id="inputHora" />
         </form>
+      </div>
 
+            <div id="formCadastro" class="signup-container">
+  <div class="signup-card">
+    <div class="signup-header">
+      <h2 class="mb-0"><i class="fas fa-user-plus me-2"></i>Cadastro</h2>
+      <p class="text-white-50 mt-2 mb-0">Crie sua conta para agendar:</p>
+    </div>
+
+    <div class="signup-body">
+      <?php if (!empty($mensagem)): ?>
+        <div class="alert alert-<?= $tipoMensagem ?>" role="alert">
+          <div class="d-flex align-items-center">
+            <?php if ($tipoMensagem == "success"): ?>
+              <i class="fas fa-check-circle text-success me-3"></i>
+            <?php else: ?>
+              <i class="fas fa-exclamation-circle text-danger me-3"></i>
+            <?php endif; ?>
+            <p class="mb-0"><?= htmlspecialchars($mensagem) ?></p>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <form method="POST" action="">
+        <div class="mb-4">
+          <label for="nome_cliente_cadastro" class="form-label">Seu Nome Completo</label>
+          <div class="input-icon-wrapper">
+            <input type="text" class="form-control" name="nome_cliente" id="nome_cliente_cadastro" placeholder="Nome Sobrenome" required>
+            <i class="fas fa-user input-icon"></i>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="telefone_cliente_cadastro" class="form-label">Telefone (com DDD)</label>
+          <div class="input-icon-wrapper">
+            <input type="tel" class="form-control" name="telefone_cliente" id="telefone_cliente_cadastro" placeholder="(XX) XXXXX-XXXX" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Formato: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX" required>
+            <i class="fas fa-phone input-icon"></i>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="email_cliente_cadastro" class="form-label">E-mail</label>
+          <div class="input-icon-wrapper">
+            <input type="email" class="form-control" name="email_cliente" id="email_cliente_cadastro" placeholder="seu.email@exemplo.com" required>
+            <i class="fas fa-envelope input-icon"></i>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="senha_cadastro" class="form-label">Crie sua Senha</label>
+          <div class="input-icon-wrapper">
+            <input type="password" class="form-control" name="senha" id="senha_cadastro" placeholder="Mínimo 6 caracteres" required>
+            <i class="fas fa-lock input-icon"></i>
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+          </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="login-link">Faça Login</a></p>
+          <button type="submit" class="btn btn-signup btn-animated px-5 py-2">
+            <i class="fas fa-user-plus me-2"></i>Cadastrar
+          </button>
+          
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+    <div id="formLogin" style="display:none;" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2 class="mb-0"><i class="fas fa-lock me-2"></i>Login</h2>
+                <p class="text-white-50 mt-2 mb-0">Bem-vindo(a) ao sistema</p>
+            </div>
+            
+            <div class="login-body">
+                <?php if (!empty($mensagemErro)): ?>
+                    <div class="error-message mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle text-danger me-3"></i>
+                            <p class="mb-0"><?= htmlspecialchars($mensagemErro) ?></p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div class="mb-4">
+                    <label for="email_cliente_login" class="form-label">Email</label>
+                    <div class="input-icon-wrapper">
+                        <input type="email" name="email_cliente" class="form-control" id="email_cliente_login" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="senha_login" class="form-label">Senha</label>
+                    <div class="input-icon-wrapper">
+                        <input type="password" name="senha" class="form-control" id="senha_login" required>
+                        <i class="fas fa-key input-icon"></i>
+                        <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+                    </div>
+                    <div class="text-end mt-2">
+                        <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
+                    </div>
+                </div>
+
+                <div class="mt-3 text-center">
+                    <div class="position-relative mb-4">
+                        <hr>
+                        <span class="position-absolute top-0 start-50 translate-middle bg-white px-3 text-muted">ou</span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                            <i class="fab fa-google me-2"></i> Entrar com Google
+                        </a>
+                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                            <i class="fab fa-facebook-f me-2"></i> Entrar com Facebook
+                        </a>
+                    </div>
+
+                    <p class="mt-4">Não tem cadastro? <a href="#" id="linkFazerCadastro" class="signup-link">Cadastre-se</a></p>
+                    <button type="submit" class="btn btn-signup btn-animated px-5 py-2">
+                        <i class="fas fa-user-plus me-2"></i>Entrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<button type="submit" class="btn-login btn-signup btn-animated px-5 py-2" id="btnConfirmarAgendamento">Confirmar Agendamento</button>!-->
       </div>
     </div>
   </div>
