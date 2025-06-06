@@ -128,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Agendamento de Serviços</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link href="styleUser.css" rel="stylesheet" />
 <link href="stylecadastroUser.css" rel="stylesheet" />
 <style>
@@ -217,11 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /*Estilos dos pedidos*/
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-  }
 
   h2 {
     font-weight: 600;
@@ -273,11 +269,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
+  body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--dark-color);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 15px 0;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+    }
+
 
 </style>
 </head>
-<body class="bg-light">
-    <section class="bg-light py-5">
+<body>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <i class="fas fa-heartbeat me-2"></i>
+      <span>Clínica Nutrição</span>
+    </a>
+    <div class="ms-auto d-flex">
+      <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
+        <i class="fas fa-home me-1"></i> Início
+      </a>
+      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+        <i class="fas fa-sign-out-alt me-1"></i> Sair
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+    <section class="py-5">
   <div class="container">
     <div class="row align-items-center g-4">
       <div class="col-md-6">
@@ -298,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </section>
 
 
-<section class="py-5 bg-light">
+<section class="py-5">
   <div class="container" style="max-width: 1320px;">
     <div class="d-flex gap-4" style="justify-content: flex-start;">
 
@@ -606,10 +647,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mb-4">
           <label for="senha_cadastro" class="form-label">Crie sua Senha</label>
           <div class="input-icon-wrapper">
-            <input type="password" class="form-control" name="senha" id="senha_cadastro" placeholder="Mínimo 6 caracteres" required>
-            <i class="fas fa-lock input-icon"></i>
-            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
-          </div>
+            <input type="password" id="senha_cadastro" class="form-control" name="senha_cadastro">
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility(this, 'senha_cadastro')"></i>
+        </div>
         </div>
 
         <div class="text-center mt-5">
@@ -654,14 +694,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-4">
                     <label for="senha_login" class="form-label">Senha</label>
                     <div class="input-icon-wrapper">
-                        <input type="password" name="senha" class="form-control" id="senha_login" required>
-                        <i class="fas fa-key input-icon"></i>
-                        <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+                        <input type="password" id="senha_login" class="form-control" name="senha_login">
+                        <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility(this, 'senha_login')"></i>
                     </div>
                     <div class="text-end mt-2">
                         <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
                     </div>
                 </div>
+
+                
 
                 <div class="mt-3 text-center">
                     <div class="position-relative mb-4">
@@ -1159,6 +1200,42 @@ document.querySelectorAll('.agendarBtn').forEach(btn => {
         document.getElementById('inputProfissionalId').value = profissionalSelecionadoId;
     });
 });
+
+
+//Codigo JS do login Iago
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação suave ao carregar a página
+    setTimeout(() => {
+      document.querySelector('.login-card').style.opacity = '1';
+    }, 100);
+    
+    // Efeito nos campos de formulário
+    document.querySelectorAll('.form-control').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+      });
+    });
+  });
+  
+  // Função para alternar a visibilidade da senha
+  function togglePasswordVisibility(icon, inputId) {
+  const senhaInput = document.getElementById(inputId);
+
+  if (senhaInput.type === 'password') {
+    senhaInput.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    senhaInput.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
 </script>
 </body>
 </html>
