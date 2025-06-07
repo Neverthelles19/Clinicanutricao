@@ -44,10 +44,12 @@
       border: 1px solid rgba(255, 255, 255, 0.5);
       box-shadow: var(--box-shadow);
       overflow: hidden;
-      width: 30em;
+      width: 100%;
+      max-width: 30em;
       transform: translateY(0);
       transition: transform 0.5s ease;
     }
+
     
     .login-card:hover {
       transform: translateY(-5px);
@@ -267,5 +269,21 @@
     .btn-animated {
       animation: pulse 2s infinite;
     }
+
+    @media (max-width: 576px) {
+  .login-card {
+    max-width: 100%;
+    margin: 0 15px;
+  }
+
+  .login-body {
+    padding: 20px;
+  }
+
+  .btn-login {
+    width: 100%;
+  }
+}
+
 
     

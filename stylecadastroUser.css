@@ -78,9 +78,11 @@
     }
     
     .signup-body {
-      padding: 30px;
-      width: 30em;
-    }
+    padding: 30px;
+    width: 100%;
+    max-width: 38em;
+  }
+
     
     .form-control {
       border-radius: var(--border-radius);
@@ -287,3 +289,19 @@
     .btn-animated {
       animation: pulse 2s infinite;
     }
+
+
+@media (max-width: 576px) {
+  .signup-body {
+    max-width: 100%;
+    margin: 0 15px;
+  }
+
+  .form-control {
+    padding: 20px;
+  }
+
+  .btn-signup {
+    width: 100%;
+  }
+}

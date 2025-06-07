@@ -128,6 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Agendamento de Serviços</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link href="styleUser.css" rel="stylesheet" />
 <link href="stylecadastroUser.css" rel="stylesheet" />
@@ -203,18 +205,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 .agendarBtn {
-  border: 2px solid #0d6efd;
-  color: #0d6efd;
-  background-color: transparent;
+  font-weight: 600;
   padding: 0.5rem 1rem;
+  border: 2px solid transparent;
   border-radius: 0.375rem;
-  transition: all 0.2s ease;
+  background: linear-gradient(90deg, #9600ff, #0f3fa8);
+  color: white;
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
 }
 
 .agendarBtn:hover {
-  background-color: #0d6efd;
-  color: #fff;
-  box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.25);
+  background: linear-gradient(90deg, #0f3fa8, #9600ff);
+  box-shadow: 0 0.25rem 0.75rem rgba(15, 63, 168, 0.3);
+  color: white;
 }
 
 /*Estilos dos pedidos*/
@@ -290,148 +297,173 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       color: var(--primary-color) !important;
     }
 
+  .info-quadrado {
+    flex: 0 0 600px;
+    min-height: 520px;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+    padding: 2.5rem;
+  }
 
-</style>
-</head>
-<body>
-<div class="floating-shapes">
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-</div>
+  .info-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f3fa8;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+  }
 
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <i class="fas fa-heartbeat me-2"></i>
-      <span>Clínica Nutrição</span>
-    </a>
-    <div class="ms-auto d-flex">
-      <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
-        <i class="fas fa-home me-1"></i> Início
-      </a>
-      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-        <i class="fas fa-sign-out-alt me-1"></i> Sair
-      </a>
-    </div>
-  </div>
-</nav>
+  .info-title i {
+    font-size: 1.3rem;
+    color: #0f3fa8;
+  }
 
+  .info-text {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 0.6rem;
+    color: #333;
+  }
 
-    <section class="py-5">
-  <div class="container">
-    <div class="row align-items-center g-4">
-      <div class="col-md-6">
-        <img src="clinica.jpg" alt="Imagem da Clínica de Nutrição" class="img-fluid rounded shadow">
-      </div>
-      <div class="col-md-6">
-        <h2 class="mb-3 text-primary">Sobre a Nossa Clínica</h2>
-        <p class="lead">Cuidar da sua saúde é a nossa prioridade.</p>
-        <p>
-          Fundada com o compromisso de promover o bem-estar e a qualidade de vida, nossa clínica oferece serviços personalizados de nutrição para todas as idades. Contamos com profissionais qualificados, atendimento humanizado e estrutura moderna.
-        </p>
-        <p>
-          Venha conhecer e descubra como podemos te ajudar a alcançar seus objetivos com saúde e equilíbrio!
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+  .btn-maps {
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border: 2px solid #0f3fa8;
+    border-radius: 0.4rem;
+    background: transparent;
+    color: #0f3fa8;
+    transition: all 0.3s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
 
+  .btn-maps:hover {
+    background: linear-gradient(90deg, #9600ff, #0f3fa8);
+    color: #fff;
+    border-color: transparent;
+  }
 
-<section class="py-5">
-  <div class="container" style="max-width: 1320px;">
-    <div class="d-flex gap-4" style="justify-content: flex-start;">
+  .social-link {
+    font-size: 1.1rem;
+    color: #0f3fa8;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
 
-      <!-- Quadrado maior: Informações -->
-      <div class="info-quadrado bg-white border rounded shadow p-5" 
-           style="flex: 0 0 600px; min-height: 520px;">
+  .social-link:hover {
+    text-decoration: underline;
+    color: #9600ff;
+  }
 
-        <h3 class="text-primary mb-4" style="font-weight: 700; font-size: 2.2rem; border-bottom: 3px solid #0d6efd; padding-bottom: 0.3rem;">
-          Informações da Clínica
-        </h3>
+  .info-block {
+    margin-bottom: 2rem;
+  }
 
-        <div class="mb-4">
-          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">📍 Localização</h5>
-          <p style="font-size: 1.15rem; margin-bottom: 0.4rem; line-height: 1.4;">
-            Rua Nutrição, 123, Bairro Saúde, Cidade - Estado
-          </p>
-          <a href="https://www.google.com/maps/search/clinica+nutri%C3%A7%C3%A3o/@-23.3095128,-45.9872362,14z?entry=ttu&g_ep=EgoyMDI1MDYwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" 
-             class="btn btn-outline-primary btn-sm px-3" style="font-weight: 600;">
-            Ver no Google Maps 🔗
-          </a>
-        </div>
+  .comodidades-quadrados {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+  }
 
-        <div class="mb-4">
-          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">⏰ Horários de Funcionamento</h5>
-          <ul class="list-unstyled" style="font-size: 1.15rem; line-height: 1.5;">
-            <li>Segunda a Sexta: 08h00 - 18h00</li>
-            <li>Sábado: 09h00 - 13h00</li>
-            <li>Domingo: Fechado</li>
-          </ul>
-        </div>
+  .comodidade-card {
+    flex: 1 1 280px;
+    background: #ffffff; /* Fundo branco */
+    border: 1.5px solid #d1c4e9; /* borda lavanda clara */
+    color: #222222;
+    border-radius: 1rem;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 4px 10px rgba(15, 63, 168, 0.07);
+    text-align: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    cursor: default;
+    min-width: 260px;
+  }
 
-        <div class="mb-4">
-          <h5 class="fw-bold text-secondary mb-2" style="font-size: 1.3rem;">💳 Formas de Pagamento</h5>
-          <p style="font-size: 1.15rem; line-height: 1.4;">
-            Aceitamos cartão de crédito, débito, Pix e dinheiro.
-          </p>
-        </div>
+  .comodidade-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(15, 63, 168, 0.15);
+    border-color: #9600ff; /* roxo da paleta no hover */
+  }
 
-        <div>
-          <h5 class="fw-bold text-secondary mb-3" style="font-size: 1.3rem;">🔗 Redes Sociais</h5>
-          <div class="d-flex flex-column gap-2">
-            <a href="https://instagram.com/clinicanutricao" target="_blank" 
-               class="text-decoration-none text-primary fw-semibold fs-5">
-              📷 Instagram
-            </a>
-            <a href="https://facebook.com/clinicanutricao" target="_blank" 
-               class="text-decoration-none text-primary fw-semibold fs-5">
-              👍 Facebook
-            </a>
-            <a href="https://twitter.com/clinicanutricao" target="_blank" 
-               class="text-decoration-none text-primary fw-semibold fs-5">
-              🐦 Twitter
-            </a>
-          </div>
-        </div>
-      </div>
+  .comodidade-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #9600ff; /* roxo da paleta */
+  }
 
-      <!-- Caixas menores: Comodidades -->
-      <div class="comodidades-quadrados d-grid gap-3" 
-           style="flex: 0 0 320px; grid-template-columns: repeat(2, 1fr);">
+  .comodidade-titulo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #0f3fa8; /* azul da paleta */
+  }
 
-        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
-          <div class="fs-3 mb-2">🅿️</div>
-          <h6 class="fw-semibold mb-1">Estacionamento</h6>
-          <p class="text-muted small mb-0">Gratuito no local</p>
-        </div>
+  .comodidade-texto {
+    font-size: 1rem;
+    color: #555555;
+  }
 
-        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
-          <div class="fs-3 mb-2">📶</div>
-          <h6 class="fw-semibold mb-1">Wi-Fi</h6>
-          <p class="text-muted small mb-0">Internet rápida e gratuita</p>
-        </div>
+  @media (max-width: 768px) {
+    .comodidade-card {
+      flex: 1 1 45%;
+      min-width: auto;
+    }
+  }
 
-        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
-          <div class="fs-3 mb-2">🧒</div>
-          <h6 class="fw-semibold mb-1">Atende Crianças</h6>
-          <p class="text-muted small mb-0">Ambiente acolhedor para crianças</p>
-        </div>
+  @media (max-width: 480px) {
+  .comodidade-card {
+    flex: 1 1 48%; /* duas caixas por linha */
+    min-width: auto;
+  }
+}
 
-        <div class="comodidade-card bg-white border rounded shadow p-3 text-center" style="cursor: default; font-size: 0.9rem;">
-          <div class="fs-3 mb-2">♿</div>
-          <h6 class="fw-semibold mb-1">Acessibilidade</h6>
-          <p class="text-muted small mb-0">Estrutura adaptada para todos</p>
-        </div>
+.btn-outline-secondary:hover {
+  background-color: #f0f0f0; /* cinza bem claro */
+  border-color: #6c757d;
+  color: #6c757d;
+}
 
-      </div>
+/* Gradiente no texto do brand */
+  .gradient-text {
+    background: linear-gradient(90deg, #9600ff, #0f3fa8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-    </div>
-  </div>
-</section>
+  /* Botão Início com fundo roxo escuro e texto branco */
+  .btn-inicio {
+    background-color: #4b0082;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
 
-<style>
+  .btn-inicio:hover {
+    background: linear-gradient(90deg, #9600ff, #0f3fa8);
+    color: #fff;
+  }
+
+  /* Garantir navbar responsivo */
+  @media (max-width: 991.98px) {
+    .navbar .container {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .ms-auto {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
   .comodidade-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
@@ -461,11 +493,158 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   .p-3 {
         padding: 80px !important;
   }
+
 </style>
+</head>
+<body>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gradient-text" href="#">
+      <i class="fas fa-heartbeat me-2"></i>
+      <span>Clínica Nutrição</span>
+    </a>
+    <div class="ms-auto d-flex">
+      <a href="#" class="btn btn-sm rounded-pill px-3 me-2 btn-inicio">
+        <i class="fas fa-home me-1"></i> Início
+      </a>
+      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+        <i class="fas fa-sign-out-alt me-1"></i> Sair
+      </a>
+    </div>
+  </div>
+</nav>
+
+    <section class="py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-md-6">
+        <img src="clinica.jpg" alt="Imagem da Clínica de Nutrição" class="img-fluid rounded shadow">
+      </div>
+      <div class="col-md-6">
+        <h2 class="mb-3 text-primary">Sobre a Nossa Clínica</h2>
+        <p class="lead">Cuidar da sua saúde é a nossa prioridade.</p>
+        <p>
+          Fundada com o compromisso de promover o bem-estar e a qualidade de vida, nossa clínica oferece serviços personalizados de nutrição para todas as idades. Contamos com profissionais qualificados, atendimento humanizado e estrutura moderna.
+        </p>
+        <p>
+          Venha conhecer e descubra como podemos te ajudar a alcançar seus objetivos com saúde e equilíbrio!
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
 
+<section class="py-5">
+  <div class="container" style="max-width: 1320px;">
+    <div class="d-flex gap-4" style="justify-content: flex-start;">
 
 
+<!-- Caixa maior - conteúdo -->
+<div class="info-quadrado">
+
+  <h3 class="text-dark mb-4" style="font-weight: 700; font-size: 2.2rem; border-bottom: 3px solid #0f3fa8; padding-bottom: 0.3rem;">
+    Informações da Clínica
+  </h3>
+
+  <div class="info-block">
+    <div class="info-title">
+      <i class="bi bi-geo-alt-fill"></i> Localização
+    </div>
+    <p class="info-text">
+      Rua Nutrição, 123, Bairro Saúde, Cidade - Estado
+    </p>
+    <a href="https://www.google.com/maps" target="_blank" class="btn-maps">
+      Ver no Google Maps <i class="bi bi-arrow-up-right"></i>
+    </a>
+  </div>
+
+  <div class="info-block">
+    <div class="info-title">
+      <i class="bi bi-clock-fill"></i> Horários de Funcionamento
+    </div>
+    <ul class="list-unstyled info-text">
+      <li>Segunda a Sexta: 08h00 - 18h00</li>
+      <li>Sábado: 09h00 - 13h00</li>
+      <li>Domingo: Fechado</li>
+    </ul>
+  </div>
+
+  <div class="info-block">
+    <div class="info-title">
+      <i class="bi bi-credit-card-2-front-fill"></i> Formas de Pagamento
+    </div>
+    <p class="info-text">
+      Aceitamos cartão de crédito, débito, Pix e dinheiro.
+    </p>
+  </div>
+
+  <div class="info-block">
+    <div class="info-title">
+      <i class="bi bi-share-fill"></i> Redes Sociais
+    </div>
+    <div class="d-flex flex-column mt-2 gap-2">
+      <a href="https://instagram.com/clinicanutricao" target="_blank" class="social-link">
+        <i class="bi bi-instagram"></i> Instagram
+      </a>
+      <a href="https://facebook.com/clinicanutricao" target="_blank" class="social-link">
+        <i class="bi bi-facebook"></i> Facebook
+      </a>
+      <a href="https://twitter.com/clinicanutricao" target="_blank" class="social-link">
+        <i class="bi bi-twitter"></i> Twitter
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Quadros de comodidades!-->
+<div class="comodidades-quadrados">
+  <div class="comodidade-card">
+    <div class="comodidade-icon">🅿️</div>
+    <div class="comodidade-titulo">Estacionamento</div>
+    <div class="comodidade-texto">Gratuito no local</div>
+  </div>
+
+  <div class="comodidade-card">
+    <div class="comodidade-icon">📶</div>
+    <div class="comodidade-titulo">Wi-Fi</div>
+    <div class="comodidade-texto">Internet rápida e gratuita</div>
+  </div>
+
+  <div class="comodidade-card">
+    <div class="comodidade-icon">🧒</div>
+    <div class="comodidade-titulo">Atendimento Infantil</div>
+    <div class="comodidade-texto">Ambiente acolhedor para crianças</div>
+  </div>
+
+  <div class="comodidade-card">
+    <div class="comodidade-icon">♿</div>
+    <div class="comodidade-titulo">Acessibilidade</div>
+    <div class="comodidade-texto">Estrutura adaptada para todos</div>
+  </div>
+
+  <div class="comodidade-card">
+    <div class="comodidade-icon">💻</div>
+    <div class="comodidade-titulo">Atendimento Online</div>
+    <div class="comodidade-texto">Consultas via videochamada</div>
+  </div>
+
+  <div class="comodidade-card">
+    <div class="comodidade-icon">📋</div>
+    <div class="comodidade-titulo">Consultas Personalizadas</div>
+    <div class="comodidade-texto">Planos alimentares exclusivos</div>
+  </div>
+</div>
+
+
+</section>
 
 
 <div class="container py-5">
@@ -598,7 +777,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
       </div>
 
-            <div id="formCadastro" class="signup-container">
+  <div id="formCadastro" class="signup-container">
   <div class="signup-card">
     <div class="signup-header">
       <h2 class="mb-0"><i class="fas fa-user-plus me-2"></i>Cadastro</h2>
