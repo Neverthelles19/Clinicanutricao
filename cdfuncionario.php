@@ -381,6 +381,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .btn-animated {
       animation: pulse 2s infinite;
     }
+
+    .gradient-text {
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .btn-gradient-hover:hover,
+  .btn-gradient-hover:focus {
+    color: white !important;
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(78, 84, 200, 0.6);
+  }
+
+  .footer-gradiente {
+  background: linear-gradient(135deg, #6b3fa8, #4a2d73);
+  color: #ddd;
+  padding: 12px 0;
+  position: relative;
+  margin-top: auto;
+  text-align: center;
+  font-weight: 400;
+  font-size: 13px;
+  overflow: hidden; /* garante que ::before não ultrapasse */
+}
+
+.footer-gradiente::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.footer-gradiente > * {
+  position: relative;
+  z-index: 1;
+}
+
   </style>
 </head>
 <body>
@@ -393,20 +443,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="#">
+    <a class="navbar-brand d-flex align-items-center gradient-text" href="#">
       <i class="fas fa-heartbeat me-2"></i>
-      <span>Clínica Nutrição</span>
+      <span class="d-none d-md-inline">Clínica Nutrição</span>
     </a>
-    <div class="ms-auto d-flex">
-      <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
-        <i class="fas fa-home me-1"></i> Início
+    <div class="ms-auto d-flex flex-wrap gap-2">
+      <a href="cadastro_servico.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-plus-circle"></i>
+        <span class="ms-1 d-none d-md-inline">Cadastro Serviço</span>
       </a>
-      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-        <i class="fas fa-sign-out-alt me-1"></i> Sair
+      <a href="cdfuncionario.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-user-tie"></i>
+        <span class="ms-1 d-none d-md-inline">Cadastro Funcionário</span>
+      </a>
+      <a href="agenda_adimin.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-calendar-alt"></i>
+        <span class="ms-1 d-none d-md-inline">Agenda Admin</span>
+      </a>
+      <a href="ver_feedbacks.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-comments"></i>
+        <span class="ms-1 d-none d-md-inline">Ver Feedbacks</span>
+      </a>
+      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="ms-1 d-none d-md-inline">Sair</span>
       </a>
     </div>
   </div>
 </nav>
+
 
 <main class="container">
   <div class="card card-form">
@@ -522,29 +587,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </main>
 
-<footer class="text-center py-4">
+<footer class="mt-5 text-white footer-gradiente py-4 text-center">
   <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-4 text-md-start">
-        <div class="d-flex align-items-center justify-content-center justify-content-md-start">
-          <i class="fas fa-heartbeat fa-2x me-3"></i>
-          <div>
-            <h5 class="mb-0">Clínica Nutrição</h5>
-            <small>Saúde e bem-estar</small>
-          </div>
+    <div class="row">
+      <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-1">
+          <i class="fas fa-heartbeat me-2"></i>
+          <h5 class="fw-bold mb-0">Clínica Nutrição</h5>
         </div>
+        <p class="mb-0">Cuidando da sua saúde com responsabilidade e equilíbrio.</p>
       </div>
-      <div class="col-md-4 my-3 my-md-0">
-        <p class="m-0">&copy; 2025 - Sistema de Agendamentos</p>
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h6 class="fw-bold">Contato</h6>
+        <p class="mb-1"><i class="fas fa-phone-alt me-2"></i>(00) 1234-5678</p>
+        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@aims.com</p>
       </div>
-      <div class="col-md-4 text-md-end">
-        <div class="d-flex justify-content-center justify-content-md-end">
-          <a href="#" class="btn btn-sm btn-light rounded-circle mx-1"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="btn btn-sm btn-light rounded-circle mx-1"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="btn btn-sm btn-light rounded-circle mx-1"><i class="fab fa-whatsapp"></i></a>
-        </div>
+      <div class="col-md-4">
+        <h6 class="fw-bold">Siga-nos</h6>
+        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="text-white"><i class="fab fa-whatsapp"></i></a>
       </div>
     </div>
+
+    <hr class="my-3 border-white">
+
+    <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
   </div>
 </footer>
 

@@ -38,50 +38,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro ADM - Nutrição</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="styleUser.css" rel="stylesheet" />
+  <link href="stylecadastroUser.css" rel="stylesheet" />
   <style>
-    .custom-green { background-color: #2B7540; }
-    .input-menor { max-width: 400px; margin: auto; }
-    .form-container { max-width: 500px; margin: auto; padding-top: 100px; }
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 15px 0;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color) !important;
+    }
+
+    .btn-outline-secondary:hover {
+  background-color: #f0f0f0; /* cinza bem claro */
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+ /* Botão Início com fundo roxo escuro e texto branco */
+  .btn-inicio {
+    background-color: #4b0082;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-inicio:hover {
+    background: linear-gradient(90deg, #9600ff, #0f3fa8);
+    color: #fff;
+  }
+
   </style>
 </head>
 <body>
 
-<header class="fixed-top custom-green text-white p-3 shadow">
-  <div class="container d-flex justify-content-between align-items-center">
-    <h1 class="h4 m-0">Nutrição</h1>
-    <nav class="nav-cliente">
-      <a href="cadastro.php" class="btn btn-light btn-sm" title="Área do ADM">👤 ADM</a>
-    </nav>
-  </div>
-</header>
-
-<div class="container form-container">
-  <h2 class="text-center mb-4">Cadastro de Administrador</h2>
-
-  <?= $mensagem ?>
-
-  <form method="POST" action="">
-    <div class="mb-3">
-      <label for="email" class="form-label">Email:</label>
-      <input type="email" name="email" class="form-control input-menor" id="email" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="senha" class="form-label">Senha:</label>
-      <input type="password" name="senha" class="form-control input-menor" id="senha" required>
-    </div>
-
-    <div class="text-center">
-      <button type="submit" class="btn btn-success px-5">Cadastrar</button>
-      <p class="mt-3">Já tem conta? <a href="login.php">Faça login</a></p>
-    </div>
-  </form>
+<div class="floating-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
 </div>
 
-<footer class="mt-5 text-white custom-green py-4 text-center">
-  <div>Copyright © 2025. Aims.</div>
-</footer>
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gradient-text" href="#">
+      <i class="fas fa-heartbeat me-2"></i>
+      <span>Clínica Nutrição</span>
+    </a>
+  </div>
+</nav>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2 class="mb-0"><i class="fas fa-user-shield me-2"></i>Cadastro de Administrador</h2>
+      <p class="text-white-50 mt-2 mb-0">Crie sua conta de administrador</p>
+    </div>
+
+    <div class="login-body">
+      <?= $mensagem ?>
+
+      <form method="POST" action="">
+        <div class="mb-4">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-icon-wrapper">
+            <input type="email" name="email" class="form-control input-menor" id="email" required>
+            <i class="fas fa-envelope input-icon"></i>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="senha" class="form-label">Senha</label>
+          <div class="input-icon-wrapper">
+            <input type="password" name="senha" class="form-control input-menor" id="senha" required>
+            <i class="fas fa-key input-icon"></i>
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+          </div>
+        </div>
+
+        <div class="text-center mt-5">
+          <button type="submit" class="btn btn-signup btn-animated px-5 py-2">
+            <i class="fas fa-user-check me-2"></i>Cadastrar
+          </button>
+          <p class="mt-4">
+            Já tem conta? <a href="login.php" class="signup-link">Faça login</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
