@@ -561,7 +561,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <img src="clinica.jpg" alt="Imagem da Clínica de Nutrição" class="img-fluid rounded shadow">
       </div>
       <div class="col-md-6">
-        <h2 class="mb-3 text-primary">Sobre a Nossa Clínica</h2>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="text-primary mb-0">Nossa Clínica</h2>
+          <a href="#agendamento" class="btn agendarBtn ms-3">Agendar agora</a>
+        </div>
+        <div class="d-flex align-items-center mb-3">
+          <span class="me-2 fs-5 fw-bold text-warning">★ 4.7</span>
+          <small class="text-muted">Baseado em 321 avaliações</small>
+        </div>
         <p class="lead">Cuidar da sua saúde é a nossa prioridade.</p>
         <p>
           Fundada com o compromisso de promover o bem-estar e a qualidade de vida, nossa clínica oferece serviços personalizados de nutrição para todas as idades. Contamos com profissionais qualificados, atendimento humanizado e estrutura moderna.
@@ -573,6 +580,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </section>
+
 
 
 <section class="py-5">
@@ -680,42 +688,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </section>
 
+<section id="agendamento" class="py-5">
+  <div class="container py-5">
+    <h2 class="mb-4 text-start">Agendamento de Serviços de Nutrição</h2>
+    <p class="text-start lead">Selecione o serviço desejado para iniciar seu agendamento.</p>
 
-<div class="container py-5">
-  <h2 class="mb-4 text-start">Agendamento de Serviços de Nutrição</h2>
-  <p class="text-start lead">Selecione o serviço desejado para iniciar seu agendamento.</p>
-
-  <div class="d-flex flex-column gap-4 align-items-start" style="max-width: 700px;">
-    <?php
-    if (mysqli_num_rows($servicos) > 0) {
-        while($s = mysqli_fetch_assoc($servicos)): ?>
-        <div class="w-100">
-          <div class="card shadow-sm border-start border-4 border-primary">
-            <div class="card-body d-flex flex-column flex-md-row justify-content-between text-start gap-3">
-              <div>
-                <h5 class="mb-2 text-primary"><?= htmlspecialchars($s['servico']) ?></h5>
-                <p class="mb-0 text-muted">
-                  <strong>Duração:</strong> <?= intval($s['duracao']) ?> min<br>
-                  <strong>Valor:</strong> R$ <?= number_format($s['valor'], 2, ',', '.') ?>
-                </p>
-              </div>
-              <div class="mt-3 mt-md-0">
-                <button class="btn btn-outline-primary agendarBtn"
-                        data-id="<?= $s['id'] ?>"
-                        data-servico="<?= htmlspecialchars($s['servico']) ?>">
-                  Agendar Agora
-                </button>
+    <div class="d-flex flex-column gap-4 align-items-start" style="max-width: 700px;">
+      <?php
+      if (mysqli_num_rows($servicos) > 0) {
+          while($s = mysqli_fetch_assoc($servicos)): ?>
+          <div class="w-100">
+            <div class="card shadow-sm border-start border-4 border-primary">
+              <div class="card-body d-flex flex-column flex-md-row justify-content-between text-start gap-3">
+                <div>
+                  <h5 class="mb-2 text-primary"><?= htmlspecialchars($s['servico']) ?></h5>
+                  <p class="mb-0 text-muted">
+                    <strong>Duração:</strong> <?= intval($s['duracao']) ?> min<br>
+                    <strong>Valor:</strong> R$ <?= number_format($s['valor'], 2, ',', '.') ?>
+                  </p>
+                </div>
+                <div class="mt-3 mt-md-0">
+                  <button class="btn btn-outline-primary agendarBtn"
+                          data-id="<?= $s['id'] ?>"
+                          data-servico="<?= htmlspecialchars($s['servico']) ?>">
+                    Agendar Agora
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <?php endwhile;
-    } else {
-        echo "<p class='text-start'>Nenhum serviço disponível no momento.</p>";
-    }
-    ?>
+          <?php endwhile;
+      } else {
+          echo "<p class='text-start'>Nenhum serviço disponível no momento.</p>";
+      }
+      ?>
+    </div>
   </div>
-</div>
+</section>
 
 
 
