@@ -103,7 +103,10 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 <head>
     <meta charset="UTF-8">
     <title>Agenda do Profissional - Calendário</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="styleUser.css" rel="stylesheet" />
+    <link href="stylecadastroUser.css" rel="stylesheet" />
     <style>
         body {
             background-color: #f8f9fa;
@@ -172,6 +175,131 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
             flex-grow: 2;
             text-align: center;
         }
+
+        .select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem; /* espaço para a seta */
+  background-color: #fff;
+}
+
+.select-wrapper::after {
+  content: "\f078"; /* ícone da seta para baixo (Font Awesome) */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6c757d;
+}
+
+
+       .btn-paleta {
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  color: #9600ff;        /* Roxo vibrante */
+  border: 2px solid #9600ff;
+  border-radius: 0.35rem;
+  background-color: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.btn-paleta:hover,
+.btn-paleta:focus {
+  background-color: #f7f7f7;  /* cinza muito clarinho e neutro */
+  color: #0f3fa8;             /* azul da paleta, mais escuro */
+  border-color: #0f3fa8;
+  outline: none;
+  box-shadow: none;
+}
+
+.horario-slot {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-left: 5px solid #9600ff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s ease;
+}
+
+.horario-slot:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hora-box strong {
+  font-size: 1.5rem;
+  color: #9600ff;
+}
+
+.info-box p {
+  margin: 2px 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Botões estilizados */
+.btn-editar {
+  color: #9600ff;
+  border: 2px solid #9600ff;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.btn-editar:hover {
+  background-color: rgba(150, 0, 255, 0.1);
+  color: #9600ff;
+}
+
+/* Botão Cancelar - Azul */
+.btn-cancelar {
+  color: #0f3fa8;
+  border: 2px solid #0f3fa8;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.btn-cancelar:hover {
+  background-color: rgba(15, 63, 168, 0.1);
+  color: #0f3fa8;
+}
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .btn-box {
+    width: 100%;
+    flex-direction: row !important;
+    justify-content: center;
+  }
+
+  .btn-box .btn {
+    flex: 1;
+  }
+
+  .hora-box {
+    text-align: left;
+  }
+}
+
+
+
+        
     </style>
 </head>
 <body class="bg-light">
@@ -195,7 +323,9 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
         <div class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label for="profissional" class="form-label">Profissional:</label>
-                <select name="profissional_id" id="profissional" class="form-select" onchange="this.form.submit()" required>
+                <div class="select-wrapper">
+                <select name="profissional_id" id="profissional" class="form-control" onchange="this.form.submit()" required>
+
                     <option value="">Selecione um profissional</option>
                     <?php
                     $profissionais = $conexao->query("SELECT id, nome FROM profissionais ORDER BY nome");
@@ -210,13 +340,14 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
                     }
                     ?>
                 </select>
+                </div>
             </div>
             <div class="col-md-4">
                 <label for="data" class="form-label">Visualizar Data:</label>
                 <input type="date" name="data" id="data" class="form-control" value="<?= htmlspecialchars($data_selecionada) ?>" onchange="this.form.submit()">
             </div>
             <div class="col-md-3 d-grid">
-                <button type="submit" class="btn btn-primary">Atualizar Agenda</button>
+                <button type="submit" class="btn btn-primary w-100 btn-signup">Atualizar Agenda</button>
             </div>
         </div>
     </form>
@@ -229,15 +360,14 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
             $data_anterior = date('Y-m-d', strtotime($data_selecionada . ' -1 day'));
             $data_proxima = date('Y-m-d', strtotime($data_selecionada . ' +1 day'));
             ?>
-            <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_anterior ?>" class="btn btn-outline-secondary">&lt; Dia Anterior</a>
+            <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_anterior ?>" class="btn-paleta">&lt; Dia Anterior</a>
             <span class="flex-grow-2 text-center fs-5 text-muted"><?= date('l', strtotime($data_selecionada)) ?>, <?= date('d/m', strtotime($data_selecionada)) ?></span>
-            <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_proxima ?>" class="btn btn-outline-secondary">Próximo Dia &gt;</a>
+            <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_proxima ?>" class="btn-paleta">Próximo Dia &gt;</a>
+
+
+
         </div>
 
-        <div class="agenda-dia">
-            <div class="dia-header">
-                <?= date("d/m/Y", strtotime($data_selecionada)) ?>
-            </div>
 
             <?php
             // Use $conexao aqui para a query da agenda, filtrando pela data selecionada
@@ -258,34 +388,42 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 
                 if ($result->num_rows > 0):
                     while ($c = $result->fetch_assoc()): ?>
-                        <div class="horario-slot">
-                            <strong><?= date("H:i", strtotime($c['hora'])) ?></strong>
-                            <div class="detalhes-consulta">
-                                <p><strong>Serviço:</strong> <?= htmlspecialchars($c['servico']) ?></p>
-                                <p><strong>Paciente:</strong> <?= htmlspecialchars($c['nome_cliente']) ?></p>
-                                <p><strong>E-mail:</strong> <?= htmlspecialchars($c['email_cliente'] ?: 'Não informado') ?></p>
-                                <p><strong>Telefone:</strong> <?= htmlspecialchars($c['telefone_cliente'] ?: 'Não informado') ?></p>
+                        <div class="horario-slot d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+  <div class="hora-box text-md-center">
+    <strong><?= date("H:i", strtotime($c['hora'])) ?></strong>
+  </div>
 
-                                <div class="btn-group" role="group" aria-label="Ações do Agendamento">
-                                    <button type="button" class="btn btn-sm btn-info"
-                                            data-bs-toggle="modal" data-bs-target="#editarAgendamentoModal"
-                                            data-id="<?= $c['id'] ?>"
-                                            data-data="<?= $c['data'] ?>"
-                                            data-hora="<?= $c['hora'] ?>"
-                                            data-servico-id="<?= $c['servico_id'] ?>"
-                                            data-cliente-id="<?= $c['cliente_id'] ?>" data-cliente-nome="<?= htmlspecialchars($c['nome_cliente']) ?>"
-                                            data-cliente-email="<?= htmlspecialchars($c['email_cliente']) ?>"
-                                            data-cliente-telefone="<?= htmlspecialchars($c['telefone_cliente']) ?>">
-                                            Editar
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                            data-bs-toggle="modal" data-bs-target="#confirmarCancelamentoModal" data-agendamento-id="<?= $c['id'] ?>"
-                                            data-profissional-id="<?= $profissional_id ?>"
-                                            data-data-selecionada="<?= $data_selecionada ?>">
-                                            Cancelar </button>
-                                </div>
-                            </div>
-                        </div>
+  <div class="info-box flex-grow-1">
+    <p><strong>Serviço:</strong> <?= htmlspecialchars($c['servico']) ?></p>
+    <p><strong>Paciente:</strong> <?= htmlspecialchars($c['nome_cliente']) ?></p>
+    <p><strong>E-mail:</strong> <?= htmlspecialchars($c['email_cliente'] ?: 'Não informado') ?></p>
+    <p><strong>Telefone:</strong> <?= htmlspecialchars($c['telefone_cliente'] ?: 'Não informado') ?></p>
+  </div>
+
+  <div class="btn-box d-flex flex-md-column gap-2">
+    <button type="button" class="btn btn-sm btn-editar"
+      data-bs-toggle="modal" data-bs-target="#editarAgendamentoModal"
+      data-id="<?= $c['id'] ?>"
+      data-data="<?= $c['data'] ?>"
+      data-hora="<?= $c['hora'] ?>"
+      data-servico-id="<?= $c['servico_id'] ?>"
+      data-cliente-id="<?= $c['cliente_id'] ?>" 
+      data-cliente-nome="<?= htmlspecialchars($c['nome_cliente']) ?>"
+      data-cliente-email="<?= htmlspecialchars($c['email_cliente']) ?>"
+      data-cliente-telefone="<?= htmlspecialchars($c['telefone_cliente']) ?>">
+      Editar
+    </button>
+
+    <button type="button" class="btn btn-sm btn-cancelar"
+      data-bs-toggle="modal" data-bs-target="#confirmarCancelamentoModal" 
+      data-agendamento-id="<?= $c['id'] ?>"
+      data-profissional-id="<?= $profissional_id ?>"
+      data-data-selecionada="<?= $data_selecionada ?>">
+      Cancelar
+    </button>
+  </div>
+</div>
+
                     <?php endwhile;
                 else:
                     echo "<div class='alert alert-info text-center mt-3'>Nenhuma consulta agendada para esta data.</div>";
