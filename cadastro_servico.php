@@ -35,110 +35,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="stylecadastroUser.css" rel="stylesheet" />
   <link href="styleUser.css" rel="stylesheet" />
+  <link href="styleForms.css" rel="stylesheet" />
   <style>
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 15px 0;
-    }
-    
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-    .btn-outline-secondary:hover {
-  background-color: #f0f0f0; /* cinza bem claro */
-  border-color: #6c757d;
-  color: #6c757d;
-}
-
- /* Botão Início com fundo roxo escuro e texto branco */
-  .btn-inicio {
-    background-color: #4b0082;
-    color: #fff;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-
-  .btn-inicio:hover {
-    background: linear-gradient(90deg, #9600ff, #0f3fa8);
-    color: #fff;
-  }
-
-  .footer-gradiente {
-  background: linear-gradient(135deg, #6b3fa8, #4a2d73);
-  color: #ddd;
-  padding: 12px 0;
+    .input-icon-wrapper {
   position: relative;
-  margin-top: auto;
-  text-align: center;
-  font-weight: 400;
-  font-size: 13px;
-  overflow: hidden; /* garante que ::before não ultrapasse */
 }
 
-.footer-gradiente::before {
-  content: '';
+.input-icon-wrapper .input-icon {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.05) 10px,
-    transparent 10px,
-    transparent 20px
-  );
+  top: 50%;
+  left: 15px; /* ou right: 15px, se o ícone estiver à direita */
+  transform: translateY(-50%);
+  color: #aaa;
   pointer-events: none;
-  z-index: 0;
+  z-index: 2;
 }
 
-.footer-gradiente > * {
-  position: relative;
-  z-index: 1;
+.input-icon-wrapper input.form-control {
+  padding-left: 40px; /* aumente se o ícone for maior ou mais afastado */
 }
-
-@media (max-width: 767.98px) {
-  footer {
-    animation: fadeOutFooter 0.5s forwards;
-  }
-}
-
-@keyframes fadeOutFooter {
-  from {
-    opacity: 1;
-    max-height: 200px; /* ajustar conforme seu footer */
-    padding: 1rem 0;
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
-    padding: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-}
-
-.gradient-text {
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .btn-gradient-hover:hover,
-  .btn-gradient-hover:focus {
-    color: white !important;
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
-    border-color: transparent;
-    box-shadow: 0 4px 15px rgba(78, 84, 200, 0.6);
-  }
 
   </style>
 </head>
@@ -169,10 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <i class="fas fa-calendar-alt"></i>
         <span class="ms-1 d-none d-md-inline">Agenda Admin</span>
       </a>
-      <a href="ver_feedbacks.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
-        <i class="fas fa-comments"></i>
-        <span class="ms-1 d-none d-md-inline">Ver Feedbacks</span>
-      </a>
       <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center">
         <i class="fas fa-sign-out-alt"></i>
         <span class="ms-1 d-none d-md-inline">Sair</span>
@@ -181,16 +92,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </nav>
 
-<main class="login-container my-5">
-  <div class="login-card card shadow rounded-4 mx-auto" style="max-width: 600px;">
-    
-    <div class="login-header p-5 pt-4">
-      <h2 class="card-title text-center mb-0 fw-bold">
-        <i class="fas fa-plus-circle me-2"></i>Cadastrar Serviço
-      </h2>
+<main class="container">
+  <div class="card card-form">
+    <div class="card-header text-center">
+      <h2 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Cadastrar Serviço</h2>
+      <p class="text-white-50 mt-2 mb-0">Adicione um novo serviço para a Clinica</p>
     </div>
-    
-    <div class="login-body card-body pt-4 pb-5 px-5">
+    <div class="card-body p-4">
       <?php if ($mensagem): ?>
         <div class="error-message alert alert-info text-center rounded-pill"><?= htmlspecialchars($mensagem) ?></div>
       <?php endif; ?>
@@ -221,14 +129,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="text-center mt-5">
-          <button type="submit" class="btn btn-signup btn-animated px-5 py-2 rounded-pill shadow-sm">
+          <button type="submit" class="btn btn-primary btn-animated px-5 py-3">
             <i class="fas fa-check me-2"></i>Cadastrar
           </button>
         </div>
       </form>
     </div>
+    </div>
   </div>
 </main>
+
 
 
 
@@ -258,15 +168,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
   </div>
 </footer>
-
-<!-- Footer simples - visível apenas em telas pequenas
-<footer class="footer-gradiente text-center py-2 d-block d-md-none bg-transparent text-muted small border-top">
-  &copy; 2025 Clínica Nutrição. Todos os direitos reservados.
-</footer>
--->
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
