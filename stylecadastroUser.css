@@ -124,6 +124,7 @@
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6);
       background: linear-gradient(135deg, #0f3fa8, #9600ff);
+      color: white;
     }
     
     .btn-outline-primary {

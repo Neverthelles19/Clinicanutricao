@@ -107,11 +107,12 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="styleUser.css" rel="stylesheet" />
     <link href="stylecadastroUser.css" rel="stylesheet" />
+    <link href="styleForms.css" rel="stylesheet" />
     <style>
         body {
             background-color: #f8f9fa;
         }
-        .container {
+        .container1 {
             background-color: #ffffff;
             padding: 30px;
             border-radius: 8px;
@@ -299,11 +300,41 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 
 
 
+
         
     </style>
 </head>
 <body class="bg-light">
-<div class="container py-5">
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gradient-text" href="#">
+      <i class="fas fa-heartbeat me-2"></i>
+      <span class="d-none d-md-inline">Clínica Nutrição</span>
+    </a>
+    <div class="ms-auto d-flex flex-wrap gap-2">
+      <a href="cadastro_servico.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-plus-circle"></i>
+        <span class="ms-1 d-none d-md-inline">Cadastro Serviço</span>
+      </a>
+      <a href="cdfuncionario.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-user-tie"></i>
+        <span class="ms-1 d-none d-md-inline">Cadastro Funcionário</span>
+      </a>
+      <a href="agenda_adimin.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-gradient-hover d-flex align-items-center">
+        <i class="fas fa-calendar-alt"></i>
+        <span class="ms-1 d-none d-md-inline">Agenda Admin</span>
+      </a>
+      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="ms-1 d-none d-md-inline">Sair</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container container1 py-5">
     <h2 class="mb-4 text-center">Agenda de Consultas do Profissional</h2>
 
     <?php if ($mensagem_sucesso): ?>
@@ -514,6 +545,35 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
         </div>
     </div>
 </div>
+<footer class="text-white footer-gradiente py-4 text-center" style="margin-top: 282px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-1">
+          <i class="fas fa-heartbeat me-2"></i>
+          <h5 class="fw-bold mb-0">Clínica Nutrição</h5>
+        </div>
+        <p class="mb-0">Cuidando da sua saúde com responsabilidade e equilíbrio.</p>
+      </div>
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h6 class="fw-bold">Contato</h6>
+        <p class="mb-1"><i class="fas fa-phone-alt me-2"></i>(00) 1234-5678</p>
+        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@aims.com</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="fw-bold">Siga-nos</h6>
+        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="text-white"><i class="fab fa-whatsapp"></i></a>
+      </div>
+    </div>
+
+    <hr class="my-3 border-white">
+
+    <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
+  </div>
+</footer>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
