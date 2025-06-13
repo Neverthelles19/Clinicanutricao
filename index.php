@@ -1,9 +1,12 @@
 <?php
-// agendamento.php
-// Inclui o arquivo de conexão com o banco de dados
-include 'conexao.php'; // Certifique-se de que este arquivo existe e está configurado corretamente.
+session_start();
+include 'conexao.php';
 
-// Função para mapear nomes de dias da semana para seus números (0 para Domingo, 1 para Segunda, etc.)
+$mensagem = '';
+$tipoMensagem = '';
+$mensagemErro = '';
+
+// Função para mapear dias, caso precise (você já tinha no código)
 function mapDaysToNumbers($dayNamesString) {
     $dayMap = [
         'Domingo' => '0',
@@ -17,110 +20,165 @@ function mapDaysToNumbers($dayNamesString) {
     $dayNames = explode(',', $dayNamesString);
     $dayNumbers = [];
     foreach ($dayNames as $dayName) {
-        $trimmedDayName = trim($dayName); // Remove espaços em branco
+        $trimmedDayName = trim($dayName);
         if (isset($dayMap[$trimmedDayName])) {
             $dayNumbers[] = $dayMap[$trimmedDayName];
         }
     }
-    return implode(',', $dayNumbers); // Retorna uma string de números separados por vírgula (ex: "1,3,6")
+    return $dayNumbers;
 }
 
-// Pega os serviços do banco de dados
-$servicos = mysqli_query($conexao, "SELECT * FROM servicos");
-if (!$servicos) {
+// Buscar serviços disponíveis
+$servicos_query = mysqli_query($conexao, "SELECT * FROM servicos");
+if (!$servicos_query) {
     die("Erro ao buscar serviços: " . mysqli_error($conexao));
 }
 
-// Pega os profissionais do banco de dados, apenas IDs a partir de 2, ordenados por nome
-$profissionais = mysqli_query($conexao, "SELECT * FROM profissionais WHERE id >= 2 ORDER BY nome");
-if (!$profissionais) {
+// Buscar profissionais com id >= 2
+$profissionais_query = mysqli_query($conexao, "SELECT * FROM profissionais WHERE id >= 2 ORDER BY nome");
+if (!$profissionais_query) {
     die("Erro ao buscar profissionais: " . mysqli_error($conexao));
 }
 
-// --- Início do Processamento do Agendamento (quando o formulário é submetido via POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Coleta e sanitiza os dados do formulário
-    $email = mysqli_real_escape_string($conexao, $_POST['email_cliente']);
-    $senha = $_POST['senha']; // A senha NÃO deve ser sanitizada com mysqli_real_escape_string antes de password_verify/hash
-    $servico_id = (int)$_POST['servico_id'];
-    $profissional_id = (int)$_POST['profissional_id'];
-    $data = mysqli_real_escape_string($conexao, $_POST['data']);
-    $hora = mysqli_real_escape_string($conexao, $_POST['hora']);
 
-    $nome_cliente = ''; // Inicializa as variáveis para nome e telefone
-    $telefone_cliente = '';
+    // Processar LOGIN
+    if (isset($_POST['email_cliente_login']) && isset($_POST['senha_login'])) {
+        $identificador_digitado = mysqli_real_escape_string($conexao, $_POST['email_cliente_login']);
+        $senha_digitada = $_POST['senha_login'];
 
-    // 1. Verifica se o cliente já existe no banco de dados pelo e-mail
-    $query_cliente = mysqli_query($conexao, "SELECT * FROM clientes WHERE email = '$email' LIMIT 1");
-    if (!$query_cliente) {
-        echo "<script>alert('Erro na consulta do cliente: " . mysqli_error($conexao) . "'); history.back();</script>";
-        exit;
-    }
-    $cliente = mysqli_fetch_assoc($query_cliente);
+        $telefone_formatado_para_busca = preg_replace('/[^0-9]/', '', $identificador_digitado);
 
-    if ($cliente) {
-        // Cliente existe, tenta fazer login com a senha fornecida
-        if (!password_verify($senha, $cliente['senha'])) {
-            echo "<script>alert('Senha incorreta para o e-mail " . htmlspecialchars($email) . "!'); history.back();</script>";
-            exit;
+        $query_login = "SELECT id, nome, email, telefone, senha FROM clientes WHERE email = '$identificador_digitado' OR telefone = '$telefone_formatado_para_busca' LIMIT 1";
+        $result_login = mysqli_query($conexao, $query_login);
+
+        if ($result_login && mysqli_num_rows($result_login) > 0) {
+            $cliente = mysqli_fetch_assoc($result_login);
+
+            if (password_verify($senha_digitada, $cliente['senha'])) {
+                $_SESSION['cliente_id'] = $cliente['id'];
+                $_SESSION['cliente_nome'] = $cliente['nome'];
+                $_SESSION['cliente_email'] = $cliente['email'];
+                $_SESSION['cliente_telefone'] = $cliente['telefone'];
+
+                header('Location: agendamento.php');
+                exit();
+            } else {
+                $mensagemErro = "Senha incorreta.";
+            }
+        } else {
+            $mensagemErro = "E-mail ou telefone não cadastrado.";
         }
-        $nome_cliente = $cliente['nome'];
-        $telefone_cliente = $cliente['telefone'];
-        $cliente_id = $cliente['id']; // Pega o ID do cliente existente
-    } else {
-        // Cliente não existe, processa o CADASTRO
-        // Verifica se os campos de nome e telefone foram enviados, pois são obrigatórios para um novo cadastro
-        if (empty($_POST['nome_cliente']) || empty($_POST['telefone_cliente'])) {
-            echo "<script>alert('Por favor, preencha seu nome e telefone para criar sua conta e agendar.'); history.back();</script>";
-            exit;
+    }
+
+    // Processar CADASTRO E AGENDAMENTO
+    elseif (isset($_POST['email_cliente_cadastro']) && isset($_POST['servico_id']) && isset($_POST['profissional_id']) && isset($_POST['data_agendamento']) && isset($_POST['hora_agendamento'])) {
+        $email_form_cadastro = mysqli_real_escape_string($conexao, $_POST['email_cliente_cadastro']);
+        $senha_form_cadastro = $_POST['senha_cadastro'];
+        $servico_id = (int)$_POST['servico_id'];
+        $profissional_id = (int)$_POST['profissional_id'];
+        $data = mysqli_real_escape_string($conexao, $_POST['data_agendamento']);
+        $hora = mysqli_real_escape_string($conexao, $_POST['hora_agendamento']);
+
+        $cliente_id = null;
+        $nome_cliente = '';
+        $telefone_cliente = '';
+
+        $query_cliente_cadastro = mysqli_query($conexao, "SELECT * FROM clientes WHERE email = '$email_form_cadastro' LIMIT 1");
+        if (!$query_cliente_cadastro) {
+            $mensagem = "Erro na consulta do cliente para cadastro: " . mysqli_error($conexao);
+            $tipoMensagem = "danger";
+        } else {
+            $cliente_existente_cadastro = mysqli_fetch_assoc($query_cliente_cadastro);
+
+            if ($cliente_existente_cadastro) {
+                if (isset($_SESSION['cliente_id']) && $_SESSION['cliente_email'] === $email_form_cadastro) {
+                    $nome_cliente = $_SESSION['cliente_nome'];
+                    $telefone_cliente = $_SESSION['cliente_telefone'];
+                    $cliente_id = $_SESSION['cliente_id'];
+                } elseif (!empty($senha_form_cadastro) && password_verify($senha_form_cadastro, $cliente_existente_cadastro['senha'])) {
+                    $nome_cliente = $cliente_existente_cadastro['nome'];
+                    $telefone_cliente = $cliente_existente_cadastro['telefone'];
+                    $cliente_id = $cliente_existente_cadastro['id'];
+
+                    $_SESSION['cliente_id'] = $cliente_id;
+                    $_SESSION['cliente_nome'] = $nome_cliente;
+                    $_SESSION['cliente_email'] = $email_form_cadastro;
+                    $_SESSION['cliente_telefone'] = $telefone_cliente;
+                } else {
+                    $mensagem = "Senha incorreta para o e-mail " . htmlspecialchars($email_form_cadastro) . ". Por favor, verifique ou use a opção de Login.";
+                    $tipoMensagem = "danger";
+                }
+            } else {
+                if (empty($_POST['nome_cliente']) || empty($_POST['telefone_cliente']) || empty($_POST['senha_cadastro'])) {
+                    $mensagem = "Por favor, preencha seu nome, telefone e crie uma senha para criar sua conta e agendar.";
+                    $tipoMensagem = "danger";
+                } else {
+                    $nome_cliente = mysqli_real_escape_string($conexao, $_POST['nome_cliente']);
+                    $telefone_cliente = mysqli_real_escape_string($conexao, $_POST['telefone_cliente']);
+                    $senha_hash = password_hash($senha_form_cadastro, PASSWORD_DEFAULT);
+
+                    $insert_cliente = mysqli_query($conexao, "INSERT INTO clientes (nome, email, telefone, senha) VALUES ('$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$senha_hash')");
+
+                    if (!$insert_cliente) {
+                        if (mysqli_errno($conexao) == 1062) {
+                            $mensagem = "Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.";
+                        } else {
+                            $mensagem = "Erro ao cadastrar cliente: " . mysqli_error($conexao);
+                        }
+                        $tipoMensagem = "danger";
+                    } else {
+                        $cliente_id = mysqli_insert_id($conexao);
+                        $mensagem = "Cadastro realizado com sucesso!";
+                        $tipoMensagem = "success";
+
+                        $_SESSION['cliente_id'] = $cliente_id;
+                        $_SESSION['cliente_nome'] = $nome_cliente;
+                        $_SESSION['cliente_email'] = $email_form_cadastro;
+                        $_SESSION['cliente_telefone'] = $telefone_cliente;
+                    }
+                }
+            }
         }
 
-        $nome_cliente = mysqli_real_escape_string($conexao, $_POST['nome_cliente']);
-        $telefone_cliente = mysqli_real_escape_string($conexao, $_POST['telefone_cliente']);
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT); // Gera o hash da senha
+        if ($cliente_id !== null && $tipoMensagem !== 'danger') {
+            $existe_agendamento = mysqli_query($conexao, "SELECT * FROM agendamentos WHERE profissional_id = $profissional_id AND data = '$data' AND hora = '$hora'");
+            if (!$existe_agendamento) {
+                $mensagem = "Erro na consulta de agendamento existente: " . mysqli_error($conexao);
+                $tipoMensagem = "danger";
+            } elseif (mysqli_num_rows($existe_agendamento) > 0) {
+                $mensagem = "Este horário já está agendado para este profissional! Por favor, escolha outro horário.";
+                $tipoMensagem = "danger";
+            } else {
+                $verifica_profissional = mysqli_query($conexao, "SELECT id FROM profissionais WHERE id = $profissional_id AND id >= 2 LIMIT 1");
+                if (!$verifica_profissional || mysqli_num_rows($verifica_profissional) == 0) {
+                    $mensagem = "Profissional selecionado não existe!";
+                    $tipoMensagem = "danger";
+                } else {
+                    $insert_agendamento = mysqli_query($conexao, "INSERT INTO agendamentos (cliente_id, profissional_id, servico_id, nome_cliente, email_cliente, telefone_cliente, data, hora)
+                        VALUES ($cliente_id, $profissional_id, $servico_id, '$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$data', '$hora')");
 
-        $insert_cliente = mysqli_query($conexao, "INSERT INTO clientes (nome, email, telefone, senha) VALUES ('$nome_cliente', '$email', '$telefone_cliente', '$senha_hash')");
+                    if ($insert_agendamento) {
+                        $mensagem = "Agendamento realizado com sucesso! Em breve, você receberá um e-mail de confirmação.";
+                        $tipoMensagem = "success";
 
-        if (!$insert_cliente) {
-            echo "<script>alert('Erro ao cadastrar cliente: " . mysqli_error($conexao) . "'); history.back();</script>";
-            exit;
+                        header('Location: agendamento.php?status=success&msg=' . urlencode($mensagem));
+                        exit;
+                    } else {
+                        $mensagem = "Erro ao realizar o agendamento: " . mysqli_error($conexao);
+                        $tipoMensagem = "danger";
+                    }
+                }
+            }
         }
-        $cliente_id = mysqli_insert_id($conexao); // Pega o ID do cliente recém-cadastrado
     }
-
-    // 2. Verifica se o horário já está agendado para o profissional na data e hora escolhidas
-    $existe_agendamento = mysqli_query($conexao, "SELECT * FROM agendamentos WHERE profissional_id = $profissional_id AND data = '$data' AND hora = '$hora'");
-    if (!$existe_agendamento) {
-        echo "<script>alert('Erro na consulta de agendamento existente: " . mysqli_error($conexao) . "'); history.back();</script>";
-        exit;
-    }
-
-    if (mysqli_num_rows($existe_agendamento) > 0) {
-        echo "<script>alert('Este horário já está agendado para este profissional! Por favor, escolha outro horário.'); history.back();</script>";
-        exit;
-    }
-
-    // NOVO: Verifica se o profissional existe e tem id >= 2
-    $verifica_profissional = mysqli_query($conexao, "SELECT id FROM profissionais WHERE id = $profissional_id AND id >= 2 LIMIT 1");
-    if (!$verifica_profissional || mysqli_num_rows($verifica_profissional) == 0) {
-        echo "<script>alert('Profissional selecionado não existe!'); history.back();</script>";
-        exit;
-    }
-
-    // 3. Insere o novo agendamento na tabela `agendamentos`
-    $insert_agendamento = mysqli_query($conexao, "INSERT INTO agendamentos (cliente_id, profissional_id, servico_id, nome_cliente, email_cliente, telefone_cliente, data, hora)
-        VALUES ($cliente_id, $profissional_id, $servico_id, '$nome_cliente', '$email', '$telefone_cliente', '$data', '$hora')");
-
-    if ($insert_agendamento) {
-        echo "<script>alert('Agendamento realizado com sucesso! Em breve, você receberá um e-mail de confirmação.'); window.location.href='agendamento.php';</script>";
-    } else {
-        echo "<script>alert('Erro ao realizar o agendamento: " . mysqli_error($conexao) . "'); history.back();</script>";
-    }
-    exit;
 }
-// --- Fim do Processamento do Agendamento ---
-?>
 
+if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'])) {
+    $mensagem = htmlspecialchars($_GET['msg']);
+    $tipoMensagem = "success";
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -132,6 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link href="styleUser.css" rel="stylesheet" />
 <link href="stylecadastroUser.css" rel="stylesheet" />
+<script src="https://apis.google.com/js/api.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -885,30 +945,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </div>
+<div id="formLogin" style="display:none;" class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2 class="mb-0"><i class="fas fa-lock me-2"></i>Login</h2>
+            <p class="text-white-50 mt-2 mb-0">Bem-vindo(a) ao sistema</p>
+        </div>
 
-
-
-    <div id="formLogin" style="display:none;" class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <h2 class="mb-0"><i class="fas fa-lock me-2"></i>Login</h2>
-                <p class="text-white-50 mt-2 mb-0">Bem-vindo(a) ao sistema</p>
-            </div>
-            
-            <div class="login-body">
-                <?php if (!empty($mensagemErro)): ?>
-                    <div class="error-message mb-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-exclamation-circle text-danger me-3"></i>
-                            <p class="mb-0"><?= htmlspecialchars($mensagemErro) ?></p>
-                        </div>
+        <div class="login-body">
+            <?php if (!empty($mensagemErro)): ?>
+                <div class="error-message mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle text-danger me-3"></i>
+                        <p class="mb-0"><?= htmlspecialchars($mensagemErro) ?></p>
                     </div>
-                <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
+            <form method="POST" action=""> 
                 <div class="mb-4">
                     <label for="email_cliente_login" class="form-label">Email</label>
                     <div class="input-icon-wrapper">
-                        <input type="email" name="email_cliente" class="form-control" id="email_cliente_login" required>
+                        <input type="email" name="email_login" class="form-control" id="email_cliente_login" required> 
                         <i class="fas fa-envelope input-icon"></i>
                     </div>
                 </div>
@@ -916,7 +974,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-4">
                     <label for="senha_login" class="form-label">Senha</label>
                     <div class="input-icon-wrapper">
-                        <input type="password" id="senha_login" class="form-control" name="senha_login">
+                        <input type="password" id="senha_login" class="form-control" name="senha_login" required>
                         <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility(this, 'senha_login')"></i>
                     </div>
                     <div class="text-end mt-2">
@@ -924,7 +982,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                
+                <div class="mt-3 text-center">
+                    <button type="submit" class="btn btn-signup btn-animated px-5 py-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Entrar </button>
+
+                    <div class="position-relative my-4"> <hr>
+                        <span class="position-absolute top-0 start-50 translate-middle bg-white px-3 text-muted">ou</span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                            <i class="fab fa-google me-2"></i> Entrar com Google
+                        </a>
+                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                            <i class="fab fa-facebook-f me-2"></i> Entrar com Facebook
+                        </a>
+                    </div>
+
+                    <p class="mt-4">Não tem cadastro? <a href="#" id="linkFazerCadastro" class="signup-link">Cadastre-se</a></p>
+                </div>
+            </form> </div>
+    </div>
+</div>
 
                 <div class="mt-3 text-center">
                     <div class="position-relative mb-4">
@@ -983,6 +1062,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
   </div>
+  <script>
+  // Função para inicializar a API de autenticação do Google
+  function startApp() {
+    gapi.load('auth2', function() {
+      gapi.auth2.init({
+        client_id: '523526330482-sp2asb3i98mp2auvq3iojp2isl23o7fl.apps.googleusercontent.com', // Substitua pelo seu ID do cliente
+        cookiepolicy: 'single_host_origin'
+      });
+    });
+  }
+  
+  document.getElementById('google-login').addEventListener('click', function() {
+    var auth2 = gapi.auth2.getAuthInstance();
+
+    auth2.signIn().then(function(googleUser) {
+      var id_token = googleUser.getAuthResponse().id_token;
+
+      // Aqui você pode enviar o id_token para o servidor
+      fetch('/processar_login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token: id_token })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Redireciona ou faz o que for necessário com o usuário
+        window.location.href = "/dashboard.php"; // Redireciona para a página principal, por exemplo
+      })
+      .catch(error => console.error('Erro:', error));
+    });
+  });
+</script>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

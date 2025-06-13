@@ -1,85 +1,138 @@
 // Variáveis globais
 let mesAtualOffset = 0; // 0 é o mês atual, 1 é o próximo, etc.
 let diasAtendimentoProfissional = [];
-let horaInicio = "09:00";
-let horaFim = "17:00";
+let horaInicio = "09:00"; // Hora de início padrão, será atualizada pelo profissional
+let horaFim = "17:00"; // Hora de fim padrão, será atualizada pelo profissional
 let servicoSelecionadoId = null;
 let profissionalSelecionadoId = null; // Inicialmente nulo, pois nenhum profissional está selecionado
 let nomeServico = '';
 let nomeProfissional = '';
 let dataSelecionadaGlobal = null;
+let horaSelecionadaGlobal = null; // Variável para armazenar a hora selecionada
 
 // Instâncias dos modais do Bootstrap
-let modalAgendamentoInstancia;
-let modalConfirmacaoInstancia;
+let modalAgendamentoInstancia; // O primeiro modal que escolhe profissional e data
+let modalConfirmacaoInstancia; // O segundo modal que escolhe a hora e tem o formulário de login/cadastro
 
+// Referências aos elementos do DOM
+// `formAgendamento` é o container geral que pode conter `formCadastro` e `formLogin`
+const formAgendamento = document.getElementById('formAgendamento');
+const formCadastro = document.getElementById('formCadastro'); // O div com o formulário de cadastro/agendamento
+const formLogin = document.getElementById('formLogin');     // O div com o formulário de login
+
+// Elementos dentro do formCadastro (Cadastro/Agendamento)
+const nomeClienteCadastro = document.getElementById('nome_cliente_cadastro');
+const emailClienteCadastro = document.getElementById('email_cliente_cadastro');
+const telefoneClienteCadastro = document.getElementById('telefone_cliente_cadastro');
+const senhaCadastro = document.getElementById('senha_cadastro');
+const inputServicoId = document.getElementById('inputServicoId');
+const inputProfissionalId = document.getElementById('inputProfissionalId');
+const inputData = document.getElementById('inputData');
+const inputHora = document.getElementById('inputHora'); // O input hidden da hora
+
+// Elementos dentro do formLogin
+const emailClienteLogin = document.getElementById('email_cliente_login');
+const senhaLogin = document.getElementById('senha_login');
+
+const linkFazerLogin = document.getElementById('linkFazerLogin');
+const linkFazerCadastro = document.getElementById('linkFazerCadastro');
+
+
+// --- Funções de Inicialização e Lógica Principal ---
 
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializa as instâncias dos modais quando o DOM estiver carregado
     modalAgendamentoInstancia = new bootstrap.Modal(document.getElementById('modalAgendamento'));
     modalConfirmacaoInstancia = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+
+    // Efeito nos campos de formulário
+    document.querySelectorAll('.form-control').forEach(input => {
+      input.addEventListener('focus', function() {
+        if (this.parentElement && this.parentElement.classList.contains('input-icon-wrapper')) {
+            this.parentElement.style.transform = 'scale(1.02)';
+        } else {
+            this.style.transform = 'scale(1.02)';
+        }
+      });
+
+      input.addEventListener('blur', function() {
+        if (this.parentElement && this.parentElement.classList.contains('input-icon-wrapper')) {
+            this.parentElement.style.transform = 'scale(1)';
+        } else {
+            this.style.transform = 'scale(1)';
+        }
+      });
+    });
+
+    // Aplica a formatação de telefone aos campos de telefone
+    formatarTelefoneInput(telefoneClienteCadastro);
+
+    // Event Listeners para alternar entre login e cadastro dentro do MODAL DE CONFIRMAÇÃO
+    linkFazerLogin.addEventListener('click', function(e) {
+        e.preventDefault();
+        mostrarFormLogin();
+    });
+
+    linkFazerCadastro.addEventListener('click', function(e) {
+        e.preventDefault();
+        mostrarFormCadastro();
+    });
+
+    // Inicializa o calendário com o offset 0 (mês atual)
+    criarCalendario(mesAtualOffset);
 });
 
+
+// --- Funções Auxiliares do Calendário e Agendamento ---
 
 // Função para renderizar o calendário
 function criarCalendario(mesOffset) {
     const hoje = new Date();
-    // Cria uma data para o 1º dia do mês que queremos exibir
     const dataExibicao = new Date(hoje.getFullYear(), hoje.getMonth() + mesOffset, 1);
 
     const ano = dataExibicao.getFullYear();
-    const mes = dataExibicao.getMonth(); // Mês indexado em 0 (0=Janeiro, 11=Dezembro)
+    const mes = dataExibicao.getMonth();
 
     const primeiroDiaMes = new Date(ano, mes, 1);
-    const ultimoDiaMes = new Date(ano, mes + 1, 0).getDate(); // Último dia do mês (ex: 31 para janeiro)
-    const diaSemanaInicio = primeiroDiaMes.getDay(); // Dia da semana do 1º dia do mês (0 para domingo, 6 para sábado)
+    const ultimoDiaMes = new Date(ano, mes + 1, 0).getDate();
+    const diaSemanaInicio = primeiroDiaMes.getDay();
 
     let html = '<table class="calendario-table"><thead><tr>';
     html += '<th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th>';
     html += '</tr></thead><tbody><tr>';
 
-    // Preenche as células vazias antes do 1º dia do mês
     for (let i = 0; i < diaSemanaInicio; i++) {
         html += '<td class="calendario-dia inativo"></td>';
     }
 
-    // Preenche os dias do mês
     for (let i = 1; i <= ultimoDiaMes; i++) {
         let dia = new Date(ano, mes, i);
-        // Formato AAAA-MM-DD para o data-dia (necessário para o backend)
         const diaStr = `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, '0')}-${String(dia.getDate()).padStart(2, '0')}`;
 
-        // Verifica se o dia é no passado em relação à data atual (não pode ser agendado)
         const dataCompletaDoDia = new Date(dia.getFullYear(), dia.getMonth(), dia.getDate());
-        const hojeSemHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()); // Compara apenas a data, sem hora
-
-        // Um dia é "passado" se for ANTES do dia de hoje
+        const hojeSemHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
         const isDiaPassado = dataCompletaDoDia < hojeSemHora;
 
-        let classeHabilitado = 'inativo'; // Por padrão, o dia é inativo
+        let classeHabilitado = 'inativo';
 
-        // Só habilita dias se um profissional estiver selecionado E o dia não for passado
         if (profissionalSelecionadoId) {
-            // `dia.getDay()` retorna 0 para domingo, 1 para segunda, etc.
-            // `diasAtendimentoProfissional` deve conter strings de números (ex: ["1", "3"])
             if (diasAtendimentoProfissional.includes(dia.getDay().toString()) && !isDiaPassado) {
                 classeHabilitado = 'habilitado';
             }
         }
-        // Se nenhum profissional está selecionado, todos os dias permanecem 'inativo' (que é o valor inicial de classeHabilitado)
 
-        html += `<td class="calendario-dia ${classeHabilitado}" data-dia="${diaStr}">${i}</td>`;
+        let classeSelecionado = (dataSelecionadaGlobal === diaStr) ? 'selecionado' : '';
 
-        // Começa uma nova linha a cada 7 dias (para formar as semanas do calendário)
+        html += `<td class="calendario-dia ${classeHabilitado} ${classeSelecionado}" data-dia="${diaStr}">${i}</td>`;
+
         if ((diaSemanaInicio + i) % 7 === 0) {
             html += '</tr><tr>';
         }
     }
 
-    // Preenche as células vazias finais se a última linha não estiver completa
     const totalCells = diaSemanaInicio + ultimoDiaMes;
     const remainingCells = 7 - (totalCells % 7);
-    if (remainingCells !== 7 && remainingCells > 0) { // Garante que não adicione uma linha vazia extra
+    if (remainingCells !== 7 && remainingCells > 0) {
         for (let i = 0; i < remainingCells; i++) {
             html += '<td class="calendario-dia inativo"></td>';
         }
@@ -87,33 +140,30 @@ function criarCalendario(mesOffset) {
 
     html += '</tr></tbody></table>';
     document.getElementById('calendario').innerHTML = html;
-    // Exibe o mês e ano atuais formatados para português
     document.getElementById('tituloMesAno').textContent = primeiroDiaMes.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' });
 
-    // Anexa/reatacha os event listeners aos botões de navegação para evitar duplicação em cada recriação
     const btnPrevMes = document.getElementById('btnPrevMes');
     const btnNextMes = document.getElementById('btnNextMes');
 
-    // Limpa event listeners antigos para evitar múltiplas chamadas
     btnPrevMes.onclick = null;
     btnNextMes.onclick = null;
 
-    // --- Lógica para desabilitar/habilitar botões de navegação ---
-    // Desabilita "Mês Anterior" se estiver no mês atual ou antes
     if (mesOffset <= 0) {
         btnPrevMes.disabled = true;
-        btnPrevMes.classList.add('disabled'); // Adiciona classe visual de desabilitado do Bootstrap
+        btnPrevMes.classList.add('disabled');
     } else {
         btnPrevMes.disabled = false;
         btnPrevMes.classList.remove('disabled');
         btnPrevMes.onclick = () => {
             mesAtualOffset--;
-            dataSelecionadaGlobal = null; // Limpa a data selecionada ao mudar de mês
-            criarCalendario(mesAtualOffset); // Recria o calendário com o novo offset
+            dataSelecionadaGlobal = null;
+            criarCalendario(mesAtualOffset);
+            document.getElementById('selectHora').innerHTML = '<option value="">Selecione um horário</option>';
+            inputHora.value = '';
+            formAgendamento.style.display = 'none';
         };
     }
 
-    // Desabilita "Próximo Mês" se estiver 3 meses à frente (mês atual (0), próximo (1), +2 (2), +3 (3) = 4 meses no total)
     if (mesOffset >= 3) {
         btnNextMes.disabled = true;
         btnNextMes.classList.add('disabled');
@@ -122,93 +172,81 @@ function criarCalendario(mesOffset) {
         btnNextMes.classList.remove('disabled');
         btnNextMes.onclick = () => {
             mesAtualOffset++;
-            dataSelecionadaGlobal = null; // Limpa a data selecionada ao mudar de mês
-            criarCalendario(mesAtualOffset); // Recria o calendário com o novo offset
+            dataSelecionadaGlobal = null;
+            criarCalendario(mesAtualOffset);
+            document.getElementById('selectHora').innerHTML = '<option value="">Selecione um horário</option>';
+            inputHora.value = '';
+            formAgendamento.style.display = 'none';
         };
     }
-    // --- Fim da lógica de botões de navegação ---
 
-    // Adiciona o event listener APENAS para os dias que estão habilitados (roxo)
-    // Primeiro remove listeners antigos para evitar múltiplas chamadas em cada recriação do calendário
     document.querySelectorAll('.calendario-dia.habilitado').forEach(dayElement => {
-        dayElement.removeEventListener('click', handleDayClick); // Remove qualquer listener anterior
-        dayElement.addEventListener('click', handleDayClick);    // Adiciona o listener atual
+        dayElement.removeEventListener('click', handleDayClick);
+        dayElement.addEventListener('click', handleDayClick);
     });
 }
 
 // Handler para o clique em um dia do calendário
 function handleDayClick(event) {
-    // Remove a classe 'selecionado' de qualquer dia que estava selecionado anteriormente
     const previouslySelected = document.querySelector('.calendario-dia.selecionado');
     if (previouslySelected) {
         previouslySelected.classList.remove('selecionado');
     }
 
-    // Adiciona a classe 'selecionado' ao dia que foi clicado
     this.classList.add('selecionado');
 
-    dataSelecionadaGlobal = this.getAttribute('data-dia'); // Pega a data no formato AAAA-MM-DD
-    document.getElementById('inputData').value = dataSelecionadaGlobal; // Preenche o input hidden para envio no formulário
+    dataSelecionadaGlobal = this.getAttribute('data-dia');
+    inputData.value = dataSelecionadaGlobal;
 
-    // Preenche os dados de confirmação no segundo modal
     document.getElementById('confirmServico').textContent = nomeServico;
     document.getElementById('confirmProfissional').textContent = nomeProfissional;
-    // Formata a data para exibição no modal de confirmação (ex: "Quarta-feira, 15 de Maio de 2024")
     const dataExibicaoFormatada = new Date(dataSelecionadaGlobal + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     document.getElementById('confirmData').textContent = dataExibicaoFormatada;
 
-    // Carrega os horários disponíveis para a data e profissional selecionados
     carregarHorariosDisponiveis(dataSelecionadaGlobal);
 
-    // Fecha o modal principal de agendamento e abre o modal de confirmação
     modalAgendamentoInstancia.hide();
     modalConfirmacaoInstancia.show();
 }
-
 
 // Função assíncrona para carregar horários disponíveis do servidor
 async function carregarHorariosDisponiveis(dataSelecionada) {
     const selectHora = document.getElementById('selectHora');
     selectHora.innerHTML = '<option value="">Carregando horários...</option>';
-    formAgendamento.style.display = 'none'; // Oculta o formulário de login/cadastro enquanto carrega
+    formAgendamento.style.display = 'none';
 
-    const interval = 60; // Intervalo de 60 minutos (1 hora) entre os agendamentos
-    let horaAtual = horaInicio; // Hora de início do expediente do profissional
-    const horariosGerados = []; // Array para armazenar todos os horários possíveis
+    const interval = 60;
+    let horaAtual = horaInicio;
+    const horariosGerados = [];
 
-    // Gera todos os horários possíveis para o dia, dentro do intervalo de trabalho do profissional
     while (true) {
         const [hAtual, mAtual] = horaAtual.split(':').map(Number);
-        const tempoAtual = new Date(); // Cria um objeto Date para manipular a hora
-        tempoAtual.setHours(hAtual, mAtual, 0, 0); // Define a hora e minuto, zerando segundos e milissegundos
+        const tempoAtual = new Date();
+        tempoAtual.setHours(hAtual, mAtual, 0, 0);
 
         const [hFim, mFim] = horaFim.split(':').map(Number);
         const tempoFim = new Date();
         tempoFim.setHours(hFim, mFim, 0, 0);
 
-        // Se o tempo atual ultrapassar ou for igual ao tempo final do expediente, pare o loop
         if (tempoAtual.getTime() >= tempoFim.getTime()) {
             break;
         }
 
-        horariosGerados.push(horaAtual); // Adiciona o horário gerado à lista
+        horariosGerados.push(horaAtual);
 
-        // Adiciona o intervalo para o próximo horário
         tempoAtual.setMinutes(tempoAtual.getMinutes() + interval);
         horaAtual = `${String(tempoAtual.getHours()).padStart(2, '0')}:${String(tempoAtual.getMinutes()).padStart(2, '0')}`;
     }
 
     try {
-        // Faz uma requisição ao servidor para obter os agendamentos já existentes para o profissional e data
         const response = await fetch(`get_agendamentos.php?profissional_id=${profissionalSelecionadoId}&data=${dataSelecionada}`);
-        if (!response.ok) { // Verifica se a resposta HTTP foi bem-sucedida (status 200)
+        if (!response.ok) {
             throw new Error(`Erro HTTP ao buscar agendamentos: ${response.status}`);
         }
-        const agendamentosExistentes = await response.json(); // Converte a resposta JSON para um objeto JavaScript
+        const agendamentosExistentes = await response.json();
 
-        selectHora.innerHTML = ''; // Limpa a mensagem de carregamento do select de horários
+        selectHora.innerHTML = '';
 
-        // Se nenhum horário foi gerado (ex: hora de início = hora de fim)
         if (horariosGerados.length === 0) {
             const option = document.createElement('option');
             option.value = '';
@@ -219,15 +257,13 @@ async function carregarHorariosDisponiveis(dataSelecionada) {
 
         let horariosDisponiveisParaSelecao = [];
 
-        // Filtra os horários gerados, removendo aqueles que já estão agendados
         horariosGerados.forEach(hora => {
             const agendado = agendamentosExistentes.some(agendamento => agendamento.hora.substring(0, 5) === hora);
-            if (!agendado) { // Se o horário NÃO estiver agendado, adicione-o aos disponíveis
+            if (!agendado) {
                 horariosDisponiveisParaSelecao.push(hora);
             }
         });
 
-        // Preenche o select de horários com as opções disponíveis
         if (horariosDisponiveisParaSelecao.length > 0) {
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
@@ -241,12 +277,11 @@ async function carregarHorariosDisponiveis(dataSelecionada) {
                 selectHora.appendChild(option);
             });
         } else {
-            // Se não houver horários disponíveis após a filtragem
             const option = document.createElement('option');
             option.value = '';
             option.textContent = 'Todos os horários estão ocupados para esta data.';
             selectHora.appendChild(option);
-            formAgendamento.style.display = 'none'; // Oculta o formulário se não houver horários
+            formAgendamento.style.display = 'none';
         }
 
     } catch (error) {
@@ -259,69 +294,59 @@ async function carregarHorariosDisponiveis(dataSelecionada) {
     }
 }
 
-
 // Event listener para a seleção de profissional no PRIMEIRO MODAL
 document.getElementById('selectProfissional').addEventListener('change', function() {
     const profissionalSelecionadoOption = this.options[this.selectedIndex];
 
-    if (profissionalSelecionadoOption.value) { // Se um profissional válido foi selecionado
+    if (profissionalSelecionadoOption.value) {
         diasAtendimentoProfissional = JSON.parse(profissionalSelecionadoOption.getAttribute('data-dias'));
-        horaInicio = profissionalSelecionadoOption.getAttribute('data-hora-inicio').substring(0, 5); // Garante formato HH:MM
-        horaFim = profissionalSelecionadoOption.getAttribute('data-hora-fim').substring(0, 5);     // Garante formato HH:MM
-        profissionalSelecionadoId = profissionalSelecionadoOption.value;
-        nomeProfissional = profissionalSelecionadoOption.textContent.split(' - ')[0]; // Pega apenas o nome do profissional
+        horaInicio = profissionalSelecionadoOption.getAttribute('data-hora-inicio').substring(0, 5);
+        horaFim = profissionalSelecionadoOption.getAttribute('data-hora-fim').substring(0, 5);
+        profissionalSelecionadoId = this.value;
+        nomeProfissional = profissionalSelecionadoOption.textContent.split(' - ')[0];
 
-        mesAtualOffset = 0; // Reseta o calendário para o mês atual ao mudar de profissional
-        criarCalendario(mesAtualOffset); // Recria o calendário com a disponibilidade do novo profissional
+        inputProfissionalId.value = profissionalSelecionadoId;
 
-    } else { // Se a opção "-- Selecione um especialista --" (valor vazio) for escolhida
-        diasAtendimentoProfissional = []; // Limpa os dias disponíveis
-        profissionalSelecionadoId = null; // Nenhum profissional selecionado
+        mesAtualOffset = 0;
+        criarCalendario(mesAtualOffset);
+
+    } else {
+        diasAtendimentoProfissional = [];
+        profissionalSelecionadoId = null;
         nomeProfissional = '';
-        mesAtualOffset = 0; // Reseta o calendário para o mês atual
-        criarCalendario(mesAtualOffset); // Recria o calendário, mostrando todos os dias como inativos
+        inputProfissionalId.value = '';
+
+        mesAtualOffset = 0;
+        criarCalendario(mesAtualOffset);
     }
-    // Limpa a seleção visual de um dia no calendário quando o profissional é alterado
     const previouslySelected = document.querySelector('.calendario-dia.selecionado');
     if (previouslySelected) {
         previouslySelected.classList.remove('selecionado');
     }
-    dataSelecionadaGlobal = null; // Zera a data selecionada para um novo agendamento
+    dataSelecionadaGlobal = null;
+    document.getElementById('selectHora').innerHTML = '<option value="">Selecione um horário</option>';
+    inputHora.value = '';
+    formAgendamento.style.display = 'none';
 });
 
 
-// Variáveis para os elementos do formulário de login/cadastro
-const formAgendamento = document.getElementById('formAgendamento');
-const formCadastro = document.getElementById('formCadastro');
-const formLogin = document.getElementById('formLogin');
-
-const nomeClienteCadastro = document.getElementById('nome_cliente_cadastro');
-const emailClienteCadastro = document.getElementById('email_cliente_cadastro');
-const telefoneClienteCadastro = document.getElementById('telefone_cliente_cadastro');
-const senhaCadastro = document.getElementById('senha_cadastro');
-
-const emailClienteLogin = document.getElementById('email_cliente_login');
-const senhaLogin = document.getElementById('senha_login');
-
-const linkFazerLogin = document.getElementById('linkFazerLogin');
-const linkFazerCadastro = document.getElementById('linkFazerCadastro');
+// --- Funções para Gerenciamento de Formulários de Login/Cadastro no Modal de Confirmação ---
 
 // Função para mostrar o formulário de cadastro e ocultar o de login
 function mostrarFormCadastro() {
     formCadastro.style.display = 'block';
     formLogin.style.display = 'none';
 
-    // Campos de cadastro são obrigatórios
     nomeClienteCadastro.setAttribute('required', 'required');
     emailClienteCadastro.setAttribute('required', 'required');
     telefoneClienteCadastro.setAttribute('required', 'required');
+    // A obrigatoriedade da senha será gerenciada pelo PHP/JS que verifica o login
     senhaCadastro.setAttribute('required', 'required');
+    senhaCadastro.style.display = 'block';
 
-    // Campos de login não são obrigatórios
     emailClienteLogin.removeAttribute('required');
     senhaLogin.removeAttribute('required');
 
-    // Limpa os campos do formulário oculto
     emailClienteLogin.value = '';
     senhaLogin.value = '';
 }
@@ -331,73 +356,90 @@ function mostrarFormLogin() {
     formLogin.style.display = 'block';
     formCadastro.style.display = 'none';
 
-    // Campos de login são obrigatórios
     emailClienteLogin.setAttribute('required', 'required');
     senhaLogin.setAttribute('required', 'required');
 
-    // Campos de cadastro não são obrigatórios
     nomeClienteCadastro.removeAttribute('required');
     emailClienteCadastro.removeAttribute('required');
     telefoneClienteCadastro.removeAttribute('required');
     senhaCadastro.removeAttribute('required');
 
-    // Limpa os campos do formulário oculto
     nomeClienteCadastro.value = '';
     emailClienteCadastro.value = '';
     telefoneClienteCadastro.value = '';
     senhaCadastro.value = '';
 }
 
-// Event Listeners para alternar entre login e cadastro
-linkFazerLogin.addEventListener('click', function(e) {
-    e.preventDefault(); // Impede o link de rolar para o topo da página
-    mostrarFormLogin();
-});
+// Função para pré-preencher dados do cliente logado e desabilitar campos
+function preencherDadosClienteLogado(nome, email, telefone) {
+    nomeClienteCadastro.value = nome;
+    emailClienteCadastro.value = email;
+    telefoneClienteCadastro.value = telefone;
 
-linkFazerCadastro.addEventListener('click', function(e) {
-    e.preventDefault(); // Impede o link de rolar para o topo da página
-    mostrarFormCadastro();
-});
+    nomeClienteCadastro.setAttribute('readonly', 'readonly');
+    emailClienteCadastro.setAttribute('readonly', 'readonly');
+    telefoneClienteCadastro.setAttribute('readonly', 'readonly');
+    senhaCadastro.removeAttribute('required');
+    senhaCadastro.style.display = 'none';
+
+    linkFazerLogin.style.display = 'none';
+    linkFazerCadastro.style.display = 'none';
+}
+
 
 // Função para formatar o telefone enquanto o usuário digita (aplicada a qualquer input de telefone)
 function formatarTelefoneInput(inputElement) {
     inputElement.addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        let value = e.target.value.replace(/\D/g, '');
         let formattedValue = '';
 
         if (value.length > 0) {
             formattedValue = '(' + value.substring(0, 2);
         }
         if (value.length > 2) {
-            if (value.length >= 7 && value.charAt(2) === '9') { // Se for um número de 9 dígitos (celular, como 9XXXX-XXXX)
+            if (value.length >= 7 && value.charAt(2) === '9') {
                  formattedValue += ') ' + value.substring(2, 7);
-            } else { // Se for 8 dígitos (fixo, como XXXX-XXXX)
+            } else {
                 formattedValue += ') ' + value.substring(2, 6);
             }
         }
-        if (value.length > 6 && value.charAt(2) === '9') { // Continuação para 9 dígitos
+        if (value.length > 6 && value.charAt(2) === '9') {
             formattedValue += '-' + value.substring(7, 11);
-        } else if (value.length > 6) { // Continuação para 8 dígitos
+        } else if (value.length > 6) {
             formattedValue += '-' + value.substring(6, 10);
         }
         e.target.value = formattedValue;
     });
 }
 
-// Aplica a formatação aos campos de telefone
-formatarTelefoneInput(telefoneClienteCadastro);
-
-
 // Event listener para a seleção de horário no SEGUNDO MODAL (de confirmação)
 document.getElementById('selectHora').addEventListener('change', function() {
-    document.getElementById('inputHora').value = this.value; // Atualiza o input hidden com o horário selecionado
-    // Só mostra o formulário de login/cadastro se um horário válido for selecionado
+    horaSelecionadaGlobal = this.value;
+    inputHora.value = horaSelecionadaGlobal;
+
     if (this.value) {
         formAgendamento.style.display = 'block';
-        // Por padrão, mostra o formulário de cadastro primeiro ao escolher a hora
-        mostrarFormCadastro();
+
+        // Aqui, chamamos uma função auxiliar que será definida globalmente (ou por PHP)
+        // para decidir qual formulário mostrar e se deve pré-preencher.
+        // `handleLoginStatusAndFormDisplay` é uma função que você adicionará globalmente
+        // OU, como discutimos, a lógica do PHP que chama `preencherDadosClienteLogado`
+        // e `mostrarFormCadastro/Login` deve estar na sua página principal.
+        // Para que o script seja totalmente separado, `handleLoginStatusAndFormDisplay`
+        // precisa ser definida **fora** deste arquivo JS, na sua página PHP,
+        // ou você fará uma chamada AJAX para verificar o status de login.
+        // Vamos manter a abordagem do PHP que imprime o JS no HTML principal por simplicidade.
+        // O código abaixo será a **única exceção** de JS que fica na página PHP.
+        if (typeof checkAndSetLoginStatus === 'function') {
+            checkAndSetLoginStatus(); // Esta função virá do PHP
+        } else {
+            mostrarFormCadastro(); // Fallback se a função do PHP não estiver disponível
+        }
+
     } else {
         formAgendamento.style.display = 'none';
+        formCadastro.style.display = 'none';
+        formLogin.style.display = 'none';
     }
 });
 
@@ -409,91 +451,61 @@ document.querySelectorAll('.agendarBtn').forEach(btn => {
         nomeServico = this.getAttribute('data-servico');
 
         document.getElementById('nomeServicoModal').textContent = nomeServico;
-        document.getElementById('inputServicoId').value = servicoSelecionadoId;
+        inputServicoId.value = servicoSelecionadoId;
 
         // --- Resetar o estado do modal principal de agendamento (primeiro modal) ---
-        document.getElementById('selectProfissional').value = ''; // Limpa a seleção do profissional
-        profissionalSelecionadoId = null; // Zera o profissional selecionado
-        nomeProfissional = ''; // Zera o nome do profissional
+        document.getElementById('selectProfissional').value = '';
+        profissionalSelecionadoId = null;
+        nomeProfissional = '';
+        inputProfissionalId.value = '';
 
-        // Reinicia o calendário para o mês atual (offset 0), mostrando todos os dias inativos
         mesAtualOffset = 0;
         criarCalendario(mesAtualOffset);
 
         // --- Resetar o estado do modal de confirmação (segundo modal) ---
         document.getElementById('selectHora').innerHTML = '<option value="">Selecione um horário</option>';
-        // Limpa e reseta o formulário de login/cadastro para o estado inicial (cadastro)
-        formAgendamento.style.display = 'none';
+        inputHora.value = '';
+        horaSelecionadaGlobal = null;
+
         nomeClienteCadastro.value = '';
         emailClienteCadastro.value = '';
         telefoneClienteCadastro.value = '';
         senhaCadastro.value = '';
         emailClienteLogin.value = '';
         senhaLogin.value = '';
-        mostrarFormCadastro(); // Garante que o formulário de cadastro esteja visível por padrão ao abrir o modal de confirmação
 
+        linkFazerLogin.style.display = 'inline';
+        linkFazerCadastro.style.display = 'inline';
 
-        // Zera a data selecionada visualmente e logicamente para um novo agendamento
-        dataSelecionadaGlobal = null;
-        const previouslySelected = document.querySelector('.calendario-dia.selecionado');
-        if (previouslySelected) {
-            previouslySelected.classList.remove('selecionado');
-        }
+        nomeClienteCadastro.removeAttribute('readonly');
+        emailClienteCadastro.removeAttribute('readonly');
+        telefoneClienteCadastro.removeAttribute('readonly');
+        senhaCadastro.setAttribute('required', 'required');
+        senhaCadastro.style.display = 'block';
 
-        // Abre o PRIMEIRO MODAL (Profissional e Calendário)
+        formAgendamento.style.display = 'none';
+        formCadastro.style.display = 'none';
+        formLogin.style.display = 'none';
+
         modalAgendamentoInstancia.show();
     });
 });
+
 document.getElementById('selectProfissional').addEventListener('change', function() {
-    document.getElementById('inputProfissionalId').value = this.value;
+    inputProfissionalId.value = this.value;
 });
 
-// Quando abrir o modal de confirmação, também garanta que o campo hidden está correto
-function atualizarCampoProfissionalId() {
-    document.getElementById('inputProfissionalId').value = profissionalSelecionadoId;
-}
+// Função para alternar a visibilidade da senha
+function togglePasswordVisibility(icon, inputId) {
+    const senhaInput = document.getElementById(inputId);
 
-// Chame essa função sempre que for abrir o modal de confirmação ou antes de submeter o formulário
-document.getElementById('selectHora').addEventListener('change', atualizarCampoProfissionalId);
-
-// E também ao clicar em "Agendar Agora"
-document.querySelectorAll('.agendarBtn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.getElementById('inputProfissionalId').value = profissionalSelecionadoId;
-    });
-});
-
-
-//Codigo JS do login Iago
-document.addEventListener('DOMContentLoaded', function() {
-    // Animação suave ao carregar a página
-    setTimeout(() => {
-      document.querySelector('.login-card').style.opacity = '1';
-    }, 100);
-    
-    // Efeito nos campos de formulário
-    document.querySelectorAll('.form-control').forEach(input => {
-      input.addEventListener('focus', function() {
-        this.parentElement.style.transform = 'scale(1.02)';
-      });
-      
-      input.addEventListener('blur', function() {
-        this.parentElement.style.transform = 'scale(1)';
-      });
-    });
-  });
-  
-  // Função para alternar a visibilidade da senha
-  function togglePasswordVisibility(icon, inputId) {
-  const senhaInput = document.getElementById(inputId);
-
-  if (senhaInput.type === 'password') {
-    senhaInput.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    senhaInput.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
+    if (senhaInput.type === 'password') {
+        senhaInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        senhaInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
 }
