@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-// --- Fim do Processamento do Agendamento ---
+
 ?>
 
 <!DOCTYPE html>
@@ -167,14 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <i class="fas fa-heartbeat me-2"></i>
       <span>Clínica Nutrição</span>
     </a>
-    <div class="ms-auto d-flex">
-      <a href="#" class="btn btn-sm rounded-pill px-3 me-2 btn-inicio">
-        <i class="fas fa-home me-1"></i> Início
-      </a>
-      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-        <i class="fas fa-sign-out-alt me-1"></i> Sair
-      </a>
-    </div>
   </div>
 </nav>
 
