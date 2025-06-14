@@ -15,80 +15,79 @@ if (isset($conexao) && $conexao instanceof mysqli) {
 $mensagem_sucesso = '';
 $mensagem_erro = '';
 
-// --- Lógica de Exclusão (agora 'Cancelamento') ---
-if (isset($_GET['acao']) && $_GET['acao'] === 'excluir' && isset($_GET['agendamento_id'])) {
-    $agendamento_id_para_excluir = intval($_GET['agendamento_id']);
+    function editarAgendamento($conexao, &$mensagem_sucesso, &$mensagem_erro) {
+      $id_agendamento = intval($_POST['id_agendamento']);
+      $nova_data = $_POST['edit_data'];
+      $nova_hora = $_POST['edit_hora'];
+      $novo_servico_id = intval($_POST['edit_servico_id']);
+      $novo_cliente_nome = $_POST['edit_cliente_nome'];
+      $novo_cliente_email = $_POST['edit_cliente_email'];
+      $novo_cliente_telefone = $_POST['edit_cliente_telefone'];
+      $cliente_id_oculto = intval($_POST['cliente_id_oculto']);
 
-    $stmt_excluir = $conexao->prepare("DELETE FROM agendamentos WHERE id = ?");
-    if ($stmt_excluir) {
-        $stmt_excluir->bind_param("i", $agendamento_id_para_excluir);
-        if ($stmt_excluir->execute()) {
-            $mensagem_sucesso = "Agendamento cancelado com sucesso!"; // Mensagem atualizada
-        } else {
-            $mensagem_erro = "Erro ao cancelar agendamento: " . $stmt_excluir->error; // Mensagem atualizada
-        }
-        $stmt_excluir->close();
-    } else {
-        $mensagem_erro = "Erro na preparação do cancelamento: " . $conexao->error; // Mensagem atualizada
-    }
-    header("Location: " . $_SERVER['PHP_SELF'] . "?profissional_id=" . ($_GET['profissional_id'] ?? '') . "&data=" . ($_GET['data'] ?? date('Y-m-d')));
-    exit();
-}
-
-// --- Lógica de Edição ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'editar_agendamento') {
-    $id_agendamento = intval($_POST['id_agendamento']);
-    $nova_data = $_POST['edit_data'];
-    $nova_hora = $_POST['edit_hora'];
-    $novo_servico_id = intval($_POST['edit_servico_id']);
-    $novo_cliente_nome = $_POST['edit_cliente_nome'];
-    $novo_cliente_email = $_POST['edit_cliente_email'];
-    $novo_cliente_telefone = $_POST['edit_cliente_telefone'];
-    $cliente_id_oculto = intval($_POST['cliente_id_oculto']); // Novo campo oculto para o cliente_id
-
-    // Inicia uma transação para garantir que ambas as atualizações ocorram ou nenhuma ocorra
-    $conexao->begin_transaction();
-    $sucesso_transacao = true;
-
-    try {
-        // 1. Atualiza os dados do cliente na tabela 'clientes'
+      $conexao->begin_transaction();
+      try {
+        // Atualiza cliente
         $stmt_update_cliente = $conexao->prepare("UPDATE clientes SET nome = ?, email = ?, telefone = ? WHERE id = ?");
         if ($stmt_update_cliente) {
-            $stmt_update_cliente->bind_param("sssi", $novo_cliente_nome, $novo_cliente_email, $novo_cliente_telefone, $cliente_id_oculto);
-            if (!$stmt_update_cliente->execute()) {
-                throw new Exception("Erro ao atualizar dados do cliente: " . $stmt_update_cliente->error);
-            }
-            $stmt_update_cliente->close();
+          $stmt_update_cliente->bind_param("sssi", $novo_cliente_nome, $novo_cliente_email, $novo_cliente_telefone, $cliente_id_oculto);
+          if (!$stmt_update_cliente->execute()) {
+            throw new Exception("Erro ao atualizar dados do cliente: " . $stmt_update_cliente->error);
+          }
+          $stmt_update_cliente->close();
         } else {
-            throw new Exception("Erro na preparação da atualização do cliente: " . $conexao->error);
+          throw new Exception("Erro na preparação da atualização do cliente: " . $conexao->error);
         }
 
-        // 2. Atualiza os dados do agendamento na tabela 'agendamentos'
-        // NOTA: As colunas nome_cliente, email_cliente, telefone_cliente em 'agendamentos'
-        // podem ser redundantes se você sempre busca de 'clientes'.
-        // Se você decidiu mantê-las em 'agendamentos' para cache/desnormalização,
-        // então elas também precisam ser atualizadas.
-        // Se não, remova-as da query abaixo. Por segurança, vou incluí-las aqui
-        // para corresponder ao seu schema existente, mas a atualização principal é no 'clientes'.
+        // Atualiza agendamento
         $stmt_update_agendamento = $conexao->prepare("UPDATE agendamentos SET data = ?, hora = ?, servico_id = ?, nome_cliente = ?, email_cliente = ?, telefone_cliente = ? WHERE id = ?");
         if ($stmt_update_agendamento) {
-            $stmt_update_agendamento->bind_param("ssisssi", $nova_data, $nova_hora, $novo_servico_id, $novo_cliente_nome, $novo_cliente_email, $novo_cliente_telefone, $id_agendamento);
-            if (!$stmt_update_agendamento->execute()) {
-                throw new Exception("Erro ao atualizar dados do agendamento: " . $stmt_update_agendamento->error);
-            }
-            $stmt_update_agendamento->close();
+          $stmt_update_agendamento->bind_param("ssisssi", $nova_data, $nova_hora, $novo_servico_id, $novo_cliente_nome, $novo_cliente_email, $novo_cliente_telefone, $id_agendamento);
+          if (!$stmt_update_agendamento->execute()) {
+            throw new Exception("Erro ao atualizar dados do agendamento: " . $stmt_update_agendamento->error);
+          }
+          $stmt_update_agendamento->close();
         } else {
-            throw new Exception("Erro na preparação da atualização do agendamento: " . $conexao->error);
+          throw new Exception("Erro na preparação da atualização do agendamento: " . $conexao->error);
         }
 
         $conexao->commit();
         $mensagem_sucesso = "Agendamento e dados do cliente atualizados com sucesso!";
-
-    } catch (Exception $e) {
+      } catch (Exception $e) {
         $conexao->rollback();
         $mensagem_erro = "Falha na edição: " . $e->getMessage();
+      }
     }
 
+    function cancelarAgendamento($conexao, &$mensagem_sucesso, &$mensagem_erro) {
+      $agendamento_id_para_excluir = intval($_GET['agendamento_id']);
+
+      $stmt_excluir = $conexao->prepare("DELETE FROM agendamentos WHERE id = ?");
+      if ($stmt_excluir) {
+        $stmt_excluir->bind_param("i", $agendamento_id_para_excluir);
+        if ($stmt_excluir->execute()) {
+          $mensagem_sucesso = "Agendamento cancelado com sucesso!"; // Mensagem atualizada
+        } else {
+          $mensagem_erro = "Erro ao cancelar agendamento: " . $stmt_excluir->error; // Mensagem atualizada
+        }
+        $stmt_excluir->close();
+      } else {
+        $mensagem_erro = "Erro na preparação do cancelamento: " . $conexao->error; // Mensagem atualizada
+      }
+      header("Location: " . $_SERVER['PHP_SELF'] . "?profissional_id=" . ($_GET['profissional_id'] ?? '') . "&data=" . ($_GET['data'] ?? date('Y-m-d')));
+      exit();
+    }
+
+
+// --- Lógica de Exclusão (agora 'Cancelamento') ---
+if (isset($_GET['acao']) && $_GET['acao'] === 'excluir' && isset($_GET['agendamento_id'])) {
+
+    cancelarAgendamento($conexao, $mensagem_sucesso, $mensagem_erro);
+}    
+
+// --- Lógica de Edição ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'editar_agendamento') {
+    editarAgendamento($conexao, $mensagem_sucesso, $mensagem_erro);
     header("Location: " . $_SERVER['PHP_SELF'] . "?profissional_id=" . ($_POST['profissional_id_oculto'] ?? '') . "&data=" . ($_POST['data_oculta'] ?? date('Y-m-d')));
     exit();
 }
@@ -109,9 +108,6 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
     <link href="styleUser.css" rel="stylesheet" />
     <link href="styleForms.css" rel="stylesheet" />
     <link rel="stylesheet" href="styleAgenda.css">
-    <style>
-
-    </style>
 </head>
 <body class="bg-light">
 
