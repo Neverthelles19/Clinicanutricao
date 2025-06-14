@@ -386,11 +386,13 @@ if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'
                   </p>
                 </div>
                 <div class="mt-3 mt-md-0">
-                  <button class="btn btn-outline-primary agendarBtn"
-                          data-id="<?= $s['id'] ?>"
-                          data-servico="<?= htmlspecialchars($s['servico']) ?>">
-                    Agendar Agora
-                  </button>
+                    <button type="button" class="btn btn-outline-primary agendarBtn"
+                            data-id="<?= $s['id'] ?>"
+                            data-servico="<?= htmlspecialchars($s['servico']) ?>"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalAgendamento">
+                      Agendar Agora
+                    </button>
                 </div>
               </div>
             </div>
@@ -715,8 +717,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'
   });
 </script>
 </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js" defer></script>
 </body>
 </html>
