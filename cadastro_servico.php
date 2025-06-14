@@ -139,10 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </main>
 
-
-
-
-
 <!-- Footer completo - visível a partir de md -->
 <footer class="mt-5 text-white footer-gradiente py-4 text-center d-none d-md-block">
   <div class="container">

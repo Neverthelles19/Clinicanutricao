@@ -298,10 +298,16 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
   }
 }
 
+.btn-suave {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-
-
-        
+.btn-suave:hover {
+  background-color: #f2f2f2;
+  color: #333;
+  border-color: #ccc;
+}
+   
     </style>
 </head>
 <body class="bg-light">
@@ -523,7 +529,6 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                 </div>
             </form>
@@ -532,33 +537,45 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 </div>
 
 <div class="modal fade" id="confirmarCancelamentoModal" tabindex="-1" aria-labelledby="confirmarCancelamentoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarCancelamentoModalLabel">Confirmar Cancelamento</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Tem certeza que deseja **cancelar** este agendamento? Esta ação não pode ser desfeita.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não, Manter</button> <a href="#" id="linkCancelarAgendamento" class="btn btn-danger">Sim, Cancelar Agendamento</a> </div>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-white border border-light shadow-sm rounded-3">
+      <div class="modal-header bg-white border-0">
+        <h5 class="modal-title text-dark fw-bold" id="confirmarCancelamentoModalLabel">
+          Cancelar Agendamento
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body text-center px-4 py-3">
+        <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+        <p class="fs-6">
+          Você está prestes a <strong class="text-danger">cancelar</strong> este agendamento.
+          <br><span class="text-muted small">Essa ação é irreversível.</span>
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pb-4">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 btn-suave" data-bs-dismiss="modal">
+          Manter Agendamento
+        </button>
+        <a href="#" id="linkCancelarAgendamento" class="btn btn-danger rounded-pill px-4">
+          Cancelar Agora
+        </a>
+      </div>
     </div>
+  </div>
 </div>
-<footer class="text-white footer-gradiente py-4 text-center" style="margin-top: 282px;">
+
+<!-- Footer completo - visível a partir de md -->
+<footer class="mt-5 text-white footer-gradiente py-4 text-center d-none d-md-block" >
   <div class="container">
     <div class="row">
-      <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
-        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-1">
-          <i class="fas fa-heartbeat me-2"></i>
-          <h5 class="fw-bold mb-0">Clínica Nutrição</h5>
-        </div>
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h5 class="fw-bold"><i class="fas fa-heartbeat me-2"></i>Clínica Nutrição</h5>
         <p class="mb-0">Cuidando da sua saúde com responsabilidade e equilíbrio.</p>
       </div>
       <div class="col-md-4 mb-3 mb-md-0">
         <h6 class="fw-bold">Contato</h6>
         <p class="mb-1"><i class="fas fa-phone-alt me-2"></i>(00) 1234-5678</p>
-        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@aims.com</p>
+        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@clinica.com</p>
       </div>
       <div class="col-md-4">
         <h6 class="fw-bold">Siga-nos</h6>
@@ -569,7 +586,6 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
     </div>
 
     <hr class="my-3 border-white">
-
     <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
   </div>
 </footer>

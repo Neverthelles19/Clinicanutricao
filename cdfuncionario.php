@@ -190,20 +190,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </main>
 
-<footer class="mt-5 text-white footer-gradiente py-4 text-center">
+<!-- Footer completo - visível a partir de md -->
+<footer class="mt-5 text-white footer-gradiente py-4 text-center d-none d-md-block">
   <div class="container">
     <div class="row">
-      <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
-        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-1">
-          <i class="fas fa-heartbeat me-2"></i>
-          <h5 class="fw-bold mb-0">Clínica Nutrição</h5>
-        </div>
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h5 class="fw-bold"><i class="fas fa-heartbeat me-2"></i>Clínica Nutrição</h5>
         <p class="mb-0">Cuidando da sua saúde com responsabilidade e equilíbrio.</p>
       </div>
       <div class="col-md-4 mb-3 mb-md-0">
         <h6 class="fw-bold">Contato</h6>
         <p class="mb-1"><i class="fas fa-phone-alt me-2"></i>(00) 1234-5678</p>
-        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@aims.com</p>
+        <p class="mb-1"><i class="fas fa-envelope me-2"></i>contato@clinica.com</p>
       </div>
       <div class="col-md-4">
         <h6 class="fw-bold">Siga-nos</h6>
@@ -214,10 +212,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <hr class="my-3 border-white">
-
     <div>&copy; 2025 Clínica Nutrição. Todos os direitos reservados.</div>
   </div>
 </footer>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>

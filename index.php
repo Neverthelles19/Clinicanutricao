@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cliente_email'] = $cliente['email'];
                 $_SESSION['cliente_telefone'] = $cliente['telefone'];
 
-                header('Location: agendamento.php');
+                header('Location: index.php');
                 exit();
             } else {
                 $mensagemErro = "Senha incorreta.";
@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mensagem = "Agendamento realizado com sucesso! Em breve, você receberá um e-mail de confirmação.";
                         $tipoMensagem = "success";
 
-                        header('Location: agendamento.php?status=success&msg=' . urlencode($mensagem));
+                        header('Location: index.php?status=success&msg=' . urlencode($mensagem));
                         exit;
                     } else {
                         $mensagem = "Erro ao realizar o agendamento: " . mysqli_error($conexao);
@@ -755,8 +755,8 @@ if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'
 
     <div class="d-flex flex-column gap-4 align-items-start" style="max-width: 700px;">
       <?php
-      if (mysqli_num_rows($servicos) > 0) {
-          while($s = mysqli_fetch_assoc($servicos)): ?>
+      if (mysqli_num_rows($servicos_query) > 0) {
+          while($s = mysqli_fetch_assoc($servicos_query)): ?>
           <div class="w-100">
             <div class="card shadow-sm border-start border-4 border-primary">
               <div class="card-body d-flex flex-column flex-md-row justify-content-between text-start gap-3">

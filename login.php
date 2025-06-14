@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="input-icon-wrapper">
             <input type="password" name="senha" class="form-control" id="senha" required>
             <i class="fas fa-key input-icon"></i>
-            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility(this, 'senha')"></i>
           </div>
           <div class="text-end mt-2">
             <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
@@ -146,6 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="input-icon-wrapper">
             <input type="password" name="senha" class="form-control input-menor" id="senha" required>
             <i class="fas fa-key input-icon"></i>
-            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility(this, 'senha')"></i>
           </div>
         </div>
 
@@ -135,6 +135,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
 </div>
-
+<script src="script.js"></script>
 </body>
 </html>
