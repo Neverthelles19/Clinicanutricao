@@ -441,6 +441,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <input type="hidden" name="profissional_id" id="inputProfissionalId" />
           <input type="hidden" name="data" id="inputData" />
           <input type="hidden" name="hora" id="inputHora" />
+          <!-- Botão comentado temporariamente para debug
+          <button type="submit" name="agendar" class="btn btn-signup btn-animated px-5 py-2" id="btnConfirmarAgendamento">
+            <i class="fas fa-calendar-check me-2"></i>Confirmar Agendamento
+          </button>
+          -->
         </form>
       </div>
 
@@ -574,7 +579,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <!--<button type="submit" class="btn-login btn-signup btn-animated px-5 py-2" id="btnConfirmarAgendamento">Confirmar Agendamento</button>!-->
+    
       </div>
     </div>
   </div>
@@ -611,5 +616,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="script.js"></script>
+<script>
+// Debug para mostrar os valores dos campos antes de enviar
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar botão de debug temporário
+    var debugBtn = document.createElement('button');
+    debugBtn.innerHTML = '<i class="fas fa-calendar-check me-2"></i>Confirmar Agendamento (Debug)';
+    debugBtn.className = 'btn btn-signup btn-animated px-5 py-2 mt-3';
+    debugBtn.id = 'btnDebugAgendamento';
+    document.querySelector('.mb-3').after(debugBtn);
+    
+    // Evento para o botão de debug
+    document.getElementById('btnDebugAgendamento').addEventListener('click', function() {
+        // Preencher os campos do formulário
+        var profId = document.getElementById('confirmProfissional').getAttribute('data-id') || '3'; // Valor padrão 3
+        var servId = document.getElementById('confirmServico').getAttribute('data-id') || '1'; // Valor padrão 1
+        var dataVal = document.getElementById('confirmData').getAttribute('data-value') || '2023-12-01'; // Valor padrão
+        var horaVal = document.getElementById('selectHora').value || '10:00'; // Valor padrão
+        
+        document.getElementById('inputProfissionalId').value = profId;
+        document.getElementById('inputServicoId').value = servId;
+        document.getElementById('inputData').value = dataVal;
+        document.getElementById('inputHora').value = horaVal;
+        
+        // Exibir os valores para debug
+        console.log('Profissional ID:', profId);
+        console.log('Serviço ID:', servId);
+        console.log('Data:', dataVal);
+        console.log('Hora:', horaVal);
+        
+        // Enviar o formulário
+        document.getElementById('formAgendamento').submit();
+    });
+    
+    // Função para preencher os campos do formulário quando o horário for selecionado
+    document.getElementById('selectHora').addEventListener('change', function() {
+        if (this.value) {
+            document.getElementById('inputHora').value = this.value;
+        }
+    });
+});
+</script>
 </body>
 </html>
