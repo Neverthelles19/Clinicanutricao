@@ -1,0 +1,199 @@
+        body {
+            background-color: #f8f9fa;
+        }
+        .container1 {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-top: 50px;
+        }
+        .agenda-dia {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+        }
+        .dia-header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .horario-slot {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #f0f8ff; /* Light blue background for time slots */
+            border: 1px solid #d0e0ff;
+        }
+        .horario-slot strong {
+            flex-shrink: 0; /* Prevent the time from shrinking */
+            width: 70px; /* Fixed width for time */
+            margin-right: 15px;
+            text-align: right;
+            font-size: 1.1em;
+            color: #333;
+        }
+        .detalhes-consulta {
+            flex-grow: 1;
+            padding-left: 10px;
+            border-left: 3px solid #0d6efd;
+        }
+        .detalhes-consulta p {
+            margin-bottom: 3px;
+        }
+        .detalhes-consulta .btn-group {
+            margin-top: 5px;
+        }
+        .navegacao-data {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .navegacao-data button {
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+        .navegacao-data input[type="date"] {
+            flex-grow: 2;
+            text-align: center;
+        }
+
+        .select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem; /* espaço para a seta */
+  background-color: #fff;
+}
+
+.select-wrapper::after {
+  content: "\f078"; /* ícone da seta para baixo (Font Awesome) */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6c757d;
+}
+
+
+       .btn-paleta {
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  color: #9600ff;        /* Roxo vibrante */
+  border: 2px solid #9600ff;
+  border-radius: 0.35rem;
+  background-color: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.btn-paleta:hover,
+.btn-paleta:focus {
+  background-color: #f7f7f7;  /* cinza muito clarinho e neutro */
+  color: #0f3fa8;             /* azul da paleta, mais escuro */
+  border-color: #0f3fa8;
+  outline: none;
+  box-shadow: none;
+}
+
+.horario-slot {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-left: 5px solid #9600ff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s ease;
+}
+
+.horario-slot:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hora-box strong {
+  font-size: 1.5rem;
+  color: #9600ff;
+}
+
+.info-box p {
+  margin: 2px 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Botões estilizados */
+.btn-editar {
+  color: #9600ff;
+  border: 2px solid #9600ff;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.btn-editar:hover {
+  background-color: rgba(150, 0, 255, 0.1);
+  color: #9600ff;
+}
+
+/* Botão Cancelar - Azul */
+.btn-cancelar {
+  color: #0f3fa8;
+  border: 2px solid #0f3fa8;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.btn-cancelar:hover {
+  background-color: rgba(15, 63, 168, 0.1);
+  color: #0f3fa8;
+}
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .btn-box {
+    width: 100%;
+    flex-direction: row !important;
+    justify-content: center;
+  }
+
+  .btn-box .btn {
+    flex: 1;
+  }
+
+  .hora-box {
+    text-align: left;
+  }
+}
+
+.btn-suave {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-suave:hover {
+  background-color: #f2f2f2;
+  color: #333;
+  border-color: #ccc;
+}
+
