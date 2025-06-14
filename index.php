@@ -40,138 +40,152 @@ if (!$profissionais_query) {
     die("Erro ao buscar profissionais: " . mysqli_error($conexao));
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // Processar LOGIN
+  // Função para processar login
+  function processarLogin($conexao) {
+    global $mensagemErro;
     if (isset($_POST['email_cliente_login']) && isset($_POST['senha_login'])) {
-        $identificador_digitado = mysqli_real_escape_string($conexao, $_POST['email_cliente_login']);
-        $senha_digitada = $_POST['senha_login'];
+      $identificador_digitado = mysqli_real_escape_string($conexao, $_POST['email_cliente_login']);
+      $senha_digitada = $_POST['senha_login'];
 
-        $telefone_formatado_para_busca = preg_replace('/[^0-9]/', '', $identificador_digitado);
+      $telefone_formatado_para_busca = preg_replace('/[^0-9]/', '', $identificador_digitado);
 
-        $query_login = "SELECT id, nome, email, telefone, senha FROM clientes WHERE email = '$identificador_digitado' OR telefone = '$telefone_formatado_para_busca' LIMIT 1";
-        $result_login = mysqli_query($conexao, $query_login);
+      $query_login = "SELECT id, nome, email, telefone, senha FROM clientes WHERE email = '$identificador_digitado' OR telefone = '$telefone_formatado_para_busca' LIMIT 1";
+      $result_login = mysqli_query($conexao, $query_login);
 
-        if ($result_login && mysqli_num_rows($result_login) > 0) {
-            $cliente = mysqli_fetch_assoc($result_login);
+      if ($result_login && mysqli_num_rows($result_login) > 0) {
+        $cliente = mysqli_fetch_assoc($result_login);
 
-            if (password_verify($senha_digitada, $cliente['senha'])) {
-                $_SESSION['cliente_id'] = $cliente['id'];
-                $_SESSION['cliente_nome'] = $cliente['nome'];
-                $_SESSION['cliente_email'] = $cliente['email'];
-                $_SESSION['cliente_telefone'] = $cliente['telefone'];
+        if (password_verify($senha_digitada, $cliente['senha'])) {
+          $_SESSION['cliente_id'] = $cliente['id'];
+          $_SESSION['cliente_nome'] = $cliente['nome'];
+          $_SESSION['cliente_email'] = $cliente['email'];
+          $_SESSION['cliente_telefone'] = $cliente['telefone'];
 
-                header('Location: index.php');
-                exit();
-            } else {
-                $mensagemErro = "Senha incorreta.";
-            }
+          header('Location: index.php');
+          exit();
         } else {
-            $mensagemErro = "E-mail ou telefone não cadastrado.";
+          $mensagemErro = "Senha incorreta.";
         }
+      } else {
+        $mensagemErro = "E-mail ou telefone não cadastrado.";
+      }
+      return true;
     }
+    return false;
+  }
 
-    // Processar CADASTRO E AGENDAMENTO
-    elseif (isset($_POST['email_cliente_cadastro']) && isset($_POST['servico_id']) && isset($_POST['profissional_id']) && isset($_POST['data_agendamento']) && isset($_POST['hora_agendamento'])) {
-        $email_form_cadastro = mysqli_real_escape_string($conexao, $_POST['email_cliente_cadastro']);
-        $senha_form_cadastro = $_POST['senha_cadastro'];
-        $servico_id = (int)$_POST['servico_id'];
-        $profissional_id = (int)$_POST['profissional_id'];
-        $data = mysqli_real_escape_string($conexao, $_POST['data_agendamento']);
-        $hora = mysqli_real_escape_string($conexao, $_POST['hora_agendamento']);
+  // Função para processar cadastro e agendamento
+  function processarCadastroEAgendamento($conexao) {
+    global $mensagem, $tipoMensagem, $mensagemErro;
+    if (isset($_POST['email_cliente_cadastro']) && isset($_POST['servico_id']) && isset($_POST['profissional_id']) && isset($_POST['data_agendamento']) && isset($_POST['hora_agendamento'])) {
+      $email_form_cadastro = mysqli_real_escape_string($conexao, $_POST['email_cliente_cadastro']);
+      $senha_form_cadastro = $_POST['senha_cadastro'];
+      $servico_id = (int)$_POST['servico_id'];
+      $profissional_id = (int)$_POST['profissional_id'];
+      $data = mysqli_real_escape_string($conexao, $_POST['data_agendamento']);
+      $hora = mysqli_real_escape_string($conexao, $_POST['hora_agendamento']);
 
-        $cliente_id = null;
-        $nome_cliente = '';
-        $telefone_cliente = '';
+      $cliente_id = null;
+      $nome_cliente = '';
+      $telefone_cliente = '';
 
-        $query_cliente_cadastro = mysqli_query($conexao, "SELECT * FROM clientes WHERE email = '$email_form_cadastro' LIMIT 1");
-        if (!$query_cliente_cadastro) {
-            $mensagem = "Erro na consulta do cliente para cadastro: " . mysqli_error($conexao);
+      $query_cliente_cadastro = mysqli_query($conexao, "SELECT * FROM clientes WHERE email = '$email_form_cadastro' LIMIT 1");
+      if (!$query_cliente_cadastro) {
+        $mensagem = "Erro na consulta do cliente para cadastro: " . mysqli_error($conexao);
+        $tipoMensagem = "danger";
+      } else {
+        $cliente_existente_cadastro = mysqli_fetch_assoc($query_cliente_cadastro);
+
+        if ($cliente_existente_cadastro) {
+          if (isset($_SESSION['cliente_id']) && $_SESSION['cliente_email'] === $email_form_cadastro) {
+            $nome_cliente = $_SESSION['cliente_nome'];
+            $telefone_cliente = $_SESSION['cliente_telefone'];
+            $cliente_id = $_SESSION['cliente_id'];
+          } elseif (!empty($senha_form_cadastro) && password_verify($senha_form_cadastro, $cliente_existente_cadastro['senha'])) {
+            $nome_cliente = $cliente_existente_cadastro['nome'];
+            $telefone_cliente = $cliente_existente_cadastro['telefone'];
+            $cliente_id = $cliente_existente_cadastro['id'];
+
+            $_SESSION['cliente_id'] = $cliente_id;
+            $_SESSION['cliente_nome'] = $nome_cliente;
+            $_SESSION['cliente_email'] = $email_form_cadastro;
+            $_SESSION['cliente_telefone'] = $telefone_cliente;
+          } else {
+            $mensagem = "Senha incorreta para o e-mail " . htmlspecialchars($email_form_cadastro) . ". Por favor, verifique ou use a opção de Login.";
             $tipoMensagem = "danger";
+          }
         } else {
-            $cliente_existente_cadastro = mysqli_fetch_assoc($query_cliente_cadastro);
+          if (empty($_POST['nome_cliente']) || empty($_POST['telefone_cliente']) || empty($_POST['senha_cadastro'])) {
+            $mensagem = "Por favor, preencha seu nome, telefone e crie uma senha para criar sua conta e agendar.";
+            $tipoMensagem = "danger";
+          } else {
+            $nome_cliente = mysqli_real_escape_string($conexao, $_POST['nome_cliente']);
+            $telefone_cliente = mysqli_real_escape_string($conexao, $_POST['telefone_cliente']);
+            $senha_hash = password_hash($senha_form_cadastro, PASSWORD_DEFAULT);
 
-            if ($cliente_existente_cadastro) {
-                if (isset($_SESSION['cliente_id']) && $_SESSION['cliente_email'] === $email_form_cadastro) {
-                    $nome_cliente = $_SESSION['cliente_nome'];
-                    $telefone_cliente = $_SESSION['cliente_telefone'];
-                    $cliente_id = $_SESSION['cliente_id'];
-                } elseif (!empty($senha_form_cadastro) && password_verify($senha_form_cadastro, $cliente_existente_cadastro['senha'])) {
-                    $nome_cliente = $cliente_existente_cadastro['nome'];
-                    $telefone_cliente = $cliente_existente_cadastro['telefone'];
-                    $cliente_id = $cliente_existente_cadastro['id'];
+            $insert_cliente = mysqli_query($conexao, "INSERT INTO clientes (nome, email, telefone, senha) VALUES ('$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$senha_hash')");
 
-                    $_SESSION['cliente_id'] = $cliente_id;
-                    $_SESSION['cliente_nome'] = $nome_cliente;
-                    $_SESSION['cliente_email'] = $email_form_cadastro;
-                    $_SESSION['cliente_telefone'] = $telefone_cliente;
-                } else {
-                    $mensagem = "Senha incorreta para o e-mail " . htmlspecialchars($email_form_cadastro) . ". Por favor, verifique ou use a opção de Login.";
-                    $tipoMensagem = "danger";
-                }
+            if (!$insert_cliente) {
+              if (mysqli_errno($conexao) == 1062) {
+                $mensagem = "Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.";
+              } else {
+                $mensagem = "Erro ao cadastrar cliente: " . mysqli_error($conexao);
+              }
+              $tipoMensagem = "danger";
             } else {
-                if (empty($_POST['nome_cliente']) || empty($_POST['telefone_cliente']) || empty($_POST['senha_cadastro'])) {
-                    $mensagem = "Por favor, preencha seu nome, telefone e crie uma senha para criar sua conta e agendar.";
-                    $tipoMensagem = "danger";
-                } else {
-                    $nome_cliente = mysqli_real_escape_string($conexao, $_POST['nome_cliente']);
-                    $telefone_cliente = mysqli_real_escape_string($conexao, $_POST['telefone_cliente']);
-                    $senha_hash = password_hash($senha_form_cadastro, PASSWORD_DEFAULT);
+              $cliente_id = mysqli_insert_id($conexao);
+              $mensagem = "Cadastro realizado com sucesso!";
+              $tipoMensagem = "success";
 
-                    $insert_cliente = mysqli_query($conexao, "INSERT INTO clientes (nome, email, telefone, senha) VALUES ('$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$senha_hash')");
-
-                    if (!$insert_cliente) {
-                        if (mysqli_errno($conexao) == 1062) {
-                            $mensagem = "Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.";
-                        } else {
-                            $mensagem = "Erro ao cadastrar cliente: " . mysqli_error($conexao);
-                        }
-                        $tipoMensagem = "danger";
-                    } else {
-                        $cliente_id = mysqli_insert_id($conexao);
-                        $mensagem = "Cadastro realizado com sucesso!";
-                        $tipoMensagem = "success";
-
-                        $_SESSION['cliente_id'] = $cliente_id;
-                        $_SESSION['cliente_nome'] = $nome_cliente;
-                        $_SESSION['cliente_email'] = $email_form_cadastro;
-                        $_SESSION['cliente_telefone'] = $telefone_cliente;
-                    }
-                }
+              $_SESSION['cliente_id'] = $cliente_id;
+              $_SESSION['cliente_nome'] = $nome_cliente;
+              $_SESSION['cliente_email'] = $email_form_cadastro;
+              $_SESSION['cliente_telefone'] = $telefone_cliente;
             }
+          }
         }
+      }
 
-        if ($cliente_id !== null && $tipoMensagem !== 'danger') {
-            $existe_agendamento = mysqli_query($conexao, "SELECT * FROM agendamentos WHERE profissional_id = $profissional_id AND data = '$data' AND hora = '$hora'");
-            if (!$existe_agendamento) {
-                $mensagem = "Erro na consulta de agendamento existente: " . mysqli_error($conexao);
-                $tipoMensagem = "danger";
-            } elseif (mysqli_num_rows($existe_agendamento) > 0) {
-                $mensagem = "Este horário já está agendado para este profissional! Por favor, escolha outro horário.";
-                $tipoMensagem = "danger";
+      if ($cliente_id !== null && $tipoMensagem !== 'danger') {
+        $existe_agendamento = mysqli_query($conexao, "SELECT * FROM agendamentos WHERE profissional_id = $profissional_id AND data = '$data' AND hora = '$hora'");
+        if (!$existe_agendamento) {
+          $mensagem = "Erro na consulta de agendamento existente: " . mysqli_error($conexao);
+          $tipoMensagem = "danger";
+        } elseif (mysqli_num_rows($existe_agendamento) > 0) {
+          $mensagem = "Este horário já está agendado para este profissional! Por favor, escolha outro horário.";
+          $tipoMensagem = "danger";
+        } else {
+          $verifica_profissional = mysqli_query($conexao, "SELECT id FROM profissionais WHERE id = $profissional_id AND id >= 2 LIMIT 1");
+          if (!$verifica_profissional || mysqli_num_rows($verifica_profissional) == 0) {
+            $mensagem = "Profissional selecionado não existe!";
+            $tipoMensagem = "danger";
+          } else {
+            $insert_agendamento = mysqli_query($conexao, "INSERT INTO agendamentos (cliente_id, profissional_id, servico_id, nome_cliente, email_cliente, telefone_cliente, data, hora)
+              VALUES ($cliente_id, $profissional_id, $servico_id, '$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$data', '$hora')");
+
+            if ($insert_agendamento) {
+              $mensagem = "Agendamento realizado com sucesso! Em breve, você receberá um e-mail de confirmação.";
+              $tipoMensagem = "success";
+
+              header('Location: index.php?status=success&msg=' . urlencode($mensagem));
+              exit;
             } else {
-                $verifica_profissional = mysqli_query($conexao, "SELECT id FROM profissionais WHERE id = $profissional_id AND id >= 2 LIMIT 1");
-                if (!$verifica_profissional || mysqli_num_rows($verifica_profissional) == 0) {
-                    $mensagem = "Profissional selecionado não existe!";
-                    $tipoMensagem = "danger";
-                } else {
-                    $insert_agendamento = mysqli_query($conexao, "INSERT INTO agendamentos (cliente_id, profissional_id, servico_id, nome_cliente, email_cliente, telefone_cliente, data, hora)
-                        VALUES ($cliente_id, $profissional_id, $servico_id, '$nome_cliente', '$email_form_cadastro', '$telefone_cliente', '$data', '$hora')");
-
-                    if ($insert_agendamento) {
-                        $mensagem = "Agendamento realizado com sucesso! Em breve, você receberá um e-mail de confirmação.";
-                        $tipoMensagem = "success";
-
-                        header('Location: index.php?status=success&msg=' . urlencode($mensagem));
-                        exit;
-                    } else {
-                        $mensagem = "Erro ao realizar o agendamento: " . mysqli_error($conexao);
-                        $tipoMensagem = "danger";
-                    }
-                }
+              $mensagem = "Erro ao realizar o agendamento: " . mysqli_error($conexao);
+              $tipoMensagem = "danger";
             }
+          }
         }
+      }
+      return true;
     }
+    return false;
+  }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Chamada das funções de processamento
+  if (!processarLogin($conexao)) {
+    processarCadastroEAgendamento($conexao);
+  }
 }
 
 if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'])) {
@@ -190,405 +204,9 @@ if (isset($_GET['status']) && $_GET['status'] === 'success' && isset($_GET['msg'
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link href="styleUser.css" rel="stylesheet" />
 <link href="stylecadastroUser.css" rel="stylesheet" />
+<link rel="stylesheet" href="style.css">
 <script src="https://apis.google.com/js/api.js"></script>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-/* Estilos do calendário */
-.calendario-table {
-  width: 100%;
-  table-layout: fixed;
-  user-select: none; /* Impede a seleção de texto no calendário */
-  border-collapse: collapse; /* Para remover espaços entre as células da tabela */
-}
-.calendario-table th, .calendario-table td {
-  text-align: center;
-  padding: 0.5rem;
-  border: 1px solid #e0e0e0; /* Borda leve para as células */
-  transition: all 0.2s ease-in-out; /* Transição suave para hover/seleção */
-}
-.calendario-table th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-}
-.calendario-dia {
-  cursor: pointer;
-  border-radius: 6px; /* Borda arredondada para os dias */
-  box-sizing: border-box; /* Garante que padding e border sejam incluídos na largura/altura */
-}
-.calendario-dia.habilitado {
-  background-color: #783f8e; /* Cor para dias disponíveis para agendamento (roxo) */
-  color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra suave */
-}
-.calendario-dia.habilitado:hover {
-  background-color: #5f259f; /* Cor mais escura no hover */
-  transform: translateY(-2px); /* Efeito de "levantar" no hover */
-}
-.calendario-dia.inativo {
-  background-color: #e9ecef; /* Cor para dias indisponíveis (passados, fora do limite ou sem profissional) */
-  color: #a0a0a0;
-  cursor: not-allowed;
-}
-.calendario-dia.selecionado {
-  border: 3px solid #3a0ca3; /* Borda forte para o dia selecionado (azul royal) */
-  background-color: #5f259f; /* Mantém a cor de habilitado, mas com borda */
-  transform: scale(1.05); /* Pequeno zoom no selecionado */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-/* Estilo para botões desabilitados do Bootstrap */
-.btn.disabled {
-    opacity: 0.65;
-    pointer-events: none; /* Impede cliques */
-}
-/* Espaçamento para o select de profissional e calendário no modal */
-#modalAgendamento .modal-body > div:first-child {
-    margin-bottom: 20px;
-}
-
-.card {
-  border-left: 4px solid #0d6efd; /* Azul Bootstrap */
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.1);
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
-.agendarBtn {
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border: 2px solid transparent;
-  border-radius: 0.375rem;
-  background: linear-gradient(90deg, #9600ff, #0f3fa8);
-  color: white;
-  transition: all 0.3s ease-in-out;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  text-decoration: none;
-}
-
-.agendarBtn:hover {
-  background: linear-gradient(90deg, #0f3fa8, #9600ff);
-  box-shadow: 0 0.25rem 0.75rem rgba(15, 63, 168, 0.3);
-  color: white;
-}
-
-/*Estilos dos pedidos*/
-
-  h2 {
-    font-weight: 600;
-  }
-
-  .card {
-    border: none;
-    border-left: 4px solid #0d6efd; /* Azul Bootstrap */
-    border-radius: 8px;
-    background-color: #ffffff;
-    transition: box-shadow 0.2s ease;
-  }
-
-  .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  .card-body {
-    padding: 1.5rem;
-  }
-
-  .btn.agendarBtn {
-    background-color: #0d6efd;
-    color: white;
-    border: none;
-    font-weight: 500;
-    padding: 0.6rem 1.2rem;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-
-  .btn.agendarBtn:hover {
-    background-color: #084298;
-    transform: translateY(-2px);
-  }
-
-  p.text-muted {
-    font-size: 0.95rem;
-  }
-
-  @media (max-width: 576px) {
-    .card-body {
-      padding: 1rem;
-    }
-    .btn.agendarBtn {
-      width: 100%;
-      text-align: center;
-    }
-  }
-
-
-  body {
-      font-family: 'Poppins', sans-serif;
-      color: var(--dark-color);
-      line-height: 1.7;
-      min-height: 100vh;
-    }
-    
-    .navbar {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 15px 0;
-    }
-    
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary-color) !important;
-    }
-
-  .info-quadrado {
-    flex: 0 0 600px;
-    min-height: 520px;
-    background: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
-    padding: 2.5rem;
-  }
-
-  .info-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #0f3fa8;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.7rem;
-  }
-
-  .info-title i {
-    font-size: 1.3rem;
-    color: #0f3fa8;
-  }
-
-  .info-text {
-    font-size: 1.1rem;
-    line-height: 1.5;
-    margin-bottom: 0.6rem;
-    color: #333;
-  }
-
-  .btn-maps {
-    font-weight: 600;
-    padding: 0.4rem 1rem;
-    border: 2px solid #0f3fa8;
-    border-radius: 0.4rem;
-    background: transparent;
-    color: #0f3fa8;
-    transition: all 0.3s ease-in-out;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-  }
-
-  .btn-maps:hover {
-    background: linear-gradient(90deg, #9600ff, #0f3fa8);
-    color: #fff;
-    border-color: transparent;
-  }
-
-  .social-link {
-    font-size: 1.1rem;
-    color: #0f3fa8;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-  }
-
-  .social-link:hover {
-    text-decoration: underline;
-    color: #9600ff;
-  }
-
-  .info-block {
-    margin-bottom: 2rem;
-  }
-
-  .comodidades-quadrados {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: center;
-  }
-
-  .comodidade-card {
-    flex: 1 1 280px;
-    background: #ffffff; /* Fundo branco */
-    border: 1.5px solid #d1c4e9; /* borda lavanda clara */
-    color: #222222;
-    border-radius: 1rem;
-    padding: 2rem 1.5rem;
-    box-shadow: 0 4px 10px rgba(15, 63, 168, 0.07);
-    text-align: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    cursor: default;
-    min-width: 260px;
-  }
-
-  .comodidade-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(15, 63, 168, 0.15);
-    border-color: #9600ff; /* roxo da paleta no hover */
-  }
-
-  .comodidade-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #9600ff; /* roxo da paleta */
-  }
-
-  .comodidade-titulo {
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-    color: #0f3fa8; /* azul da paleta */
-  }
-
-  .comodidade-texto {
-    font-size: 1rem;
-    color: #555555;
-  }
-
-  @media (max-width: 768px) {
-    .comodidade-card {
-      flex: 1 1 45%;
-      min-width: auto;
-    }
-  }
-
-  @media (max-width: 480px) {
-  .comodidade-card {
-    flex: 1 1 48%; /* duas caixas por linha */
-    min-width: auto;
-  }
-}
-
-.btn-outline-secondary:hover {
-  background-color: #f0f0f0; /* cinza bem claro */
-  border-color: #6c757d;
-  color: #6c757d;
-}
-
-/* Gradiente no texto do brand */
-  .gradient-text {
-    background: linear-gradient(90deg, #9600ff, #0f3fa8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* Botão Início com fundo roxo escuro e texto branco */
-  .btn-inicio {
-    background-color: #4b0082;
-    color: #fff;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-
-  .btn-inicio:hover {
-    background: linear-gradient(90deg, #9600ff, #0f3fa8);
-    color: #fff;
-  }
-
-  /* Garantir navbar responsivo */
-  @media (max-width: 991.98px) {
-    .navbar .container {
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .ms-auto {
-      width: 100%;
-      justify-content: flex-end;
-    }
-  }
-
-  .comodidade-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  @media (max-width: 991px) {
-    .container > div.d-flex {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-    }
-    .info-quadrado, .comodidades-quadrados {
-      flex: 1 1 100% !important;
-      max-width: 100% !important;
-      min-height: auto !important;
-      margin-bottom: 2rem;
-    }
-    .comodidades-quadrados {
-      grid-template-columns: 1fr !important;
-    }
-    .comodidade-card {
-      font-size: 1rem !important;
-      width: 100% !important;
-    }
-  }
-
-  .p-3 {
-        padding: 80px !important;
-  }
-
-  .footer-gradiente {
-  background: linear-gradient(135deg, #6b3fa8, #4a2d73);
-  color: #ddd;
-  padding: 12px 0;
-  position: relative;
-  margin-top: auto;
-  text-align: center;
-  font-weight: 400;
-  font-size: 13px;
-  overflow: hidden; /* garante que ::before não ultrapasse */
-}
-
-.footer-gradiente::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.05) 10px,
-    transparent 10px,
-    transparent 20px
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.footer-gradiente > * {
-  position: relative;
-  z-index: 1;
-}
-
-</style>
 </head>
 <body>
 <div class="floating-shapes">

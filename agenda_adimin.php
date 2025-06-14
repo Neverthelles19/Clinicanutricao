@@ -199,11 +199,7 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
             <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_anterior ?>" class="btn-paleta">&lt; Dia Anterior</a>
             <span class="flex-grow-2 text-center fs-5 text-muted"><?= date('l', strtotime($data_selecionada)) ?>, <?= date('d/m', strtotime($data_selecionada)) ?></span>
             <a href="?profissional_id=<?= $profissional_id ?>&data=<?= $data_proxima ?>" class="btn-paleta">Próximo Dia &gt;</a>
-
-
-
         </div>
-
 
             <?php
             // Use $conexao aqui para a query da agenda, filtrando pela data selecionada
@@ -238,23 +234,25 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 
     <div class="btn-box d-flex flex-md-column gap-2">
       <button type="button" class="btn btn-sm btn-editar"
-        data-bs-toggle="modal" data-bs-target="#editarAgendamentoModal"
-        data-id="<?= $c['id'] ?>"
-        data-data="<?= $c['data'] ?>"
-        data-hora="<?= $c['hora'] ?>"
-        data-servico-id="<?= $c['servico_id'] ?>"
-        data-cliente-id="<?= $c['cliente_id'] ?>" 
-        data-cliente-nome="<?= htmlspecialchars($c['nome_cliente']) ?>"
-        data-cliente-email="<?= htmlspecialchars($c['email_cliente']) ?>"
-        data-cliente-telefone="<?= htmlspecialchars($c['telefone_cliente']) ?>">
+        onclick="abrirModalEditarAgendamento(
+            <?= $c['id'] ?>,
+            '<?= $c['data'] ?>',
+            '<?= $c['hora'] ?>',
+            <?= $c['servico_id'] ?>,
+            <?= $c['cliente_id'] ?>,
+            `<?= htmlspecialchars($c['nome_cliente'], ENT_QUOTES) ?>`,
+            `<?= htmlspecialchars($c['email_cliente'], ENT_QUOTES) ?>`,
+            `<?= htmlspecialchars($c['telefone_cliente'], ENT_QUOTES) ?>`
+        )">
         Editar
       </button>
 
       <button type="button" class="btn btn-sm btn-cancelar"
-        data-bs-toggle="modal" data-bs-target="#confirmarCancelamentoModal" 
-        data-agendamento-id="<?= $c['id'] ?>"
-        data-profissional-id="<?= $profissional_id ?>"
-        data-data-selecionada="<?= $data_selecionada ?>">
+        onclick="abrirModalCancelarAgendamento(
+            <?= $c['id'] ?>,
+            <?= $profissional_id ?>,
+            '<?= $data_selecionada ?>'
+        )">
         Cancelar
       </button>
   </div>
@@ -274,97 +272,7 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
         <div class="alert alert-info text-center mt-4">Por favor, selecione um profissional para visualizar a agenda.</div>
     <?php endif; ?>
 </div>
-
-<div class="modal fade" id="editarAgendamentoModal" tabindex="-1" aria-labelledby="editarAgendamentoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editarAgendamentoModalLabel">Editar Agendamento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
-                <div class="modal-body">
-                    <input type="hidden" name="acao" value="editar_agendamento">
-                    <input type="hidden" name="id_agendamento" id="modal_id_agendamento">
-                    <input type="hidden" name="cliente_id_oculto" id="modal_cliente_id_oculto">
-                    <input type="hidden" name="profissional_id_oculto" value="<?= htmlspecialchars($profissional_id) ?>">
-                    <input type="hidden" name="data_oculta" value="<?= htmlspecialchars($data_selecionada) ?>">
-
-                    <div class="mb-3">
-                        <label for="edit_data" class="form-label">Data:</label>
-                        <input type="date" class="form-control" id="edit_data" name="edit_data" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_hora" class="form-label">Hora:</label>
-                        <input type="time" class="form-control" id="edit_hora" name="edit_hora" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_servico_id" class="form-label">Serviço:</label>
-                        <select class="form-select" id="edit_servico_id" name="edit_servico_id" required>
-                            <option value="">Selecione um serviço</option>
-                            <?php
-                            // Obter serviços para preencher o dropdown do modal
-                            $servicos_modal = $conexao->query("SELECT id, servico FROM servicos ORDER BY servico");
-                            if ($servicos_modal) {
-                                while ($serv = $servicos_modal->fetch_assoc()) {
-                                    echo "<option value='{$serv['id']}'>{$serv['servico']}</option>";
-                                }
-                                $servicos_modal->free();
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_cliente_nome" class="form-label">Nome do Paciente:</label>
-                        <input type="text" class="form-control" id="edit_cliente_nome" name="edit_cliente_nome" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_cliente_email" class="form-label">E-mail do Paciente:</label>
-                        <input type="email" class="form-control" id="edit_cliente_email" name="edit_cliente_email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_cliente_telefone" class="form-label">Telefone do Paciente:</label>
-                        <input type="text" class="form-control" id="edit_cliente_telefone" name="edit_cliente_telefone">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="confirmarCancelamentoModal" tabindex="-1" aria-labelledby="confirmarCancelamentoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-white border border-light shadow-sm rounded-3">
-      <div class="modal-header bg-white border-0">
-        <h5 class="modal-title text-dark fw-bold" id="confirmarCancelamentoModalLabel">
-          Cancelar Agendamento
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body text-center px-4 py-3">
-        <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
-        <p class="fs-6">
-          Você está prestes a <strong class="text-danger">cancelar</strong> este agendamento.
-          <br><span class="text-muted small">Essa ação é irreversível.</span>
-        </p>
-      </div>
-      <div class="modal-footer justify-content-center border-0 pb-4">
-        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 btn-suave" data-bs-dismiss="modal">
-          Manter Agendamento
-        </button>
-        <a href="#" id="linkCancelarAgendamento" class="btn btn-danger rounded-pill px-4">
-          Cancelar Agora
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-  
 </main>
-
 
 <!-- Footer completo - visível a partir de md -->
 <footer class="mt-5 text-white footer-gradiente py-4 text-center d-none d-md-block" >
@@ -392,52 +300,96 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
   </div>
 </footer>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Script para preencher o modal de edição (existente)
-    var editarAgendamentoModal = document.getElementById('editarAgendamentoModal');
-    editarAgendamentoModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var id = button.getAttribute('data-id');
-        var data = button.getAttribute('data-data');
-        var hora = button.getAttribute('data-hora');
-        var servicoId = button.getAttribute('data-servico-id');
-        var clienteId = button.getAttribute('data-cliente-id');
-        var clienteNome = button.getAttribute('data-cliente-nome');
-        var clienteEmail = button.getAttribute('data-cliente-email');
-        var clienteTelefone = button.getAttribute('data-cliente-telefone');
+    // Função para abrir o modal de edição usando SweetAlert2
+    function abrirModalEditarAgendamento(id, data, hora, servicoId, clienteId, clienteNome, clienteEmail, clienteTelefone) {
+        // Monta o select de serviços via PHP embutido
+        let servicosOptions = `
+            <option value="">Selecione um serviço</option>
+            <?php
+            $servicos_modal = $conexao->query("SELECT id, servico FROM servicos ORDER BY servico");
+            if ($servicos_modal) {
+                while ($serv = $servicos_modal->fetch_assoc()) {
+                    echo "<option value='{$serv['id']}'>{${'serv'}['servico']}</option>";
+                }
+                $servicos_modal->free();
+            }
+            ?>
+        `;
 
-        var modalIdAgendamento = editarAgendamentoModal.querySelector('#modal_id_agendamento');
-        var modalClienteIdOculto = editarAgendamentoModal.querySelector('#modal_cliente_id_oculto');
-        var modalData = editarAgendamentoModal.querySelector('#edit_data');
-        var modalHora = editarAgendamentoModal.querySelector('#edit_hora');
-        var modalServicoId = editarAgendamentoModal.querySelector('#edit_servico_id');
-        var modalClienteNome = editarAgendamentoModal.querySelector('#edit_cliente_nome');
-        var modalClienteEmail = editarAgendamentoModal.querySelector('#edit_cliente_email');
-        var modalClienteTelefone = editarAgendamentoModal.querySelector('#edit_cliente_telefone');
+        Swal.fire({
+            title: 'Editar Agendamento',
+            html:
+                `<form id="formEditarAgendamento" action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+                    <input type="hidden" name="acao" value="editar_agendamento">
+                    <input type="hidden" name="id_agendamento" value="${id}">
+                    <input type="hidden" name="cliente_id_oculto" value="${clienteId}">
+                    <input type="hidden" name="profissional_id_oculto" value="<?= htmlspecialchars($profissional_id) ?>">
+                    <input type="hidden" name="data_oculta" value="<?= htmlspecialchars($data_selecionada) ?>">
 
-        modalIdAgendamento.value = id;
-        modalClienteIdOculto.value = clienteId;
-        modalData.value = data;
-        modalHora.value = hora;
-        modalServicoId.value = servicoId;
-        modalClienteNome.value = clienteNome;
-        modalClienteEmail.value = clienteEmail;
-        modalClienteTelefone.value = clienteTelefone;
-    });
+                    <div class="mb-3 text-start">
+                        <label for="edit_data" class="form-label">Data:</label>
+                        <input type="date" class="form-control" id="edit_data" name="edit_data" required value="${data}">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="edit_hora" class="form-label">Hora:</label>
+                        <input type="time" class="form-control" id="edit_hora" name="edit_hora" required value="${hora}">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="edit_servico_id" class="form-label">Serviço:</label>
+                        <select class="form-select" id="edit_servico_id" name="edit_servico_id" required>
+                            ${servicosOptions}
+                        </select>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="edit_cliente_nome" class="form-label">Nome do Paciente:</label>
+                        <input type="text" class="form-control" id="edit_cliente_nome" name="edit_cliente_nome" required value="${clienteNome}">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="edit_cliente_email" class="form-label">E-mail do Paciente:</label>
+                        <input type="email" class="form-control" id="edit_cliente_email" name="edit_cliente_email" value="${clienteEmail}">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="edit_cliente_telefone" class="form-label">Telefone do Paciente:</label>
+                        <input type="text" class="form-control" id="edit_cliente_telefone" name="edit_cliente_telefone" value="${clienteTelefone}">
+                    </div>
+                </form>`,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar Alterações',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            didOpen: () => {
+                // Seleciona o serviço correto
+                document.getElementById('edit_servico_id').value = servicoId;
+            },
+            preConfirm: () => {
+                document.getElementById('formEditarAgendamento').submit();
+                return false;
+            }
+        });
+    }
 
-    // Script para preencher o modal de confirmação de cancelamento
-    var confirmarCancelamentoModal = document.getElementById('confirmarCancelamentoModal'); // ID atualizado
-    confirmarCancelamentoModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var agendamentoId = button.getAttribute('data-agendamento-id');
-        var profissionalId = button.getAttribute('data-profissional-id');
-        var dataSelecionada = button.getAttribute('data-data-selecionada');
-
-        var linkCancelar = confirmarCancelamentoModal.querySelector('#linkCancelarAgendamento'); // ID atualizado
-        linkCancelar.href = `?acao=excluir&agendamento_id=${agendamentoId}&profissional_id=${profissionalId}&data=${dataSelecionada}`;
-    });
+    // Função para abrir o modal de confirmação de cancelamento usando SweetAlert2
+    function abrirModalCancelarAgendamento(agendamentoId, profissionalId, dataSelecionada) {
+        Swal.fire({
+            title: 'Cancelar Agendamento',
+            html: `<p class="fs-6">
+                Você está prestes a <strong class="text-danger">cancelar</strong> este agendamento.<br>
+                <span class="text-muted small">Essa ação é irreversível.</span>
+            </p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Cancelar Agora',
+            cancelButtonText: 'Manter Agendamento',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `?acao=excluir&agendamento_id=${agendamentoId}&profissional_id=${profissionalId}&data=${dataSelecionada}`;
+            }
+        });
+    }
 </script>
 </body>
 </html>
