@@ -102,8 +102,11 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 <head>
     <meta charset="UTF-8">
     <title>Agenda do Profissional - Calendário</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Custom Styles -->
     <link href="stylecadastroUser.css" rel="stylesheet" />
     <link href="styleUser.css" rel="stylesheet" />
     <link href="styleForms.css" rel="stylesheet" />
@@ -302,6 +305,9 @@ $data_selecionada = isset($_GET['data']) ? $_GET['data'] : date('Y-m-d');
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Bootstrap JS (Popper + Bootstrap Bundle) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Função para abrir o modal de edição usando SweetAlert2
     function abrirModalEditarAgendamento(id, data, hora, servicoId, clienteId, clienteNome, clienteEmail, clienteTelefone) {
