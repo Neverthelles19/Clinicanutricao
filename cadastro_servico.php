@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <i class="fas fa-calendar-alt"></i>
         <span class="ms-1 d-none d-md-inline">Agenda Admin</span>
       </a>
-      <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center">
+      <a href="logoutAdm.php" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center">
         <i class="fas fa-sign-out-alt"></i>
         <span class="ms-1 d-none d-md-inline">Sair</span>
       </a>

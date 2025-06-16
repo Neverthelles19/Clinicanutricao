@@ -270,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span>Clínica Nutrição</span>
                 </a>
                 <div class="ms-auto d-flex">
-                    <a href="#" class="btn btn-sm rounded-pill px-3 me-2 btn-inicio">
+                    <a href="index.php" class="btn btn-sm rounded-pill px-3 me-2 btn-inicio">
                         <i class="fas fa-home me-1"></i> Início
                     </a>
                     <a href="logout.php" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
@@ -669,19 +669,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="senha_cadastro" class="form-label">Crie sua Senha</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" id="senha_cadastro" class="form-control" name="senha_cadastro" required minlength="6">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" onclick="togglePasswordVisibility(this, 'senha_cadastro')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                  <label for="senha_cadastro" class="form-label">Crie sua Senha</label>
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                      <input type="password" id="senha_cadastro" class="form-control" name="senha_cadastro" required minlength="6">
+                                      <span class="input-group-text" style="cursor:pointer;" onclick="togglePasswordVisibility(this, 'senha_cadastro')">
+                                          <i class="fas fa-eye"></i>
+                                      </span>
+                                  </div>
+                              </div>
+
 
                                 <div class="text-center mt-4">
                                     <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="text-primary">Faça Login</a></p>
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
+                                    <button type="submit" class="btn btn-primary btn-signup btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
                                         <i class="fas fa-user-plus me-2"></i>Cadastrar e Agendar
                                     </button>
                                 </div>
@@ -706,21 +707,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="senha_login" class="form-label">Senha</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" id="senha_login" class="form-control" name="senha_login" required minlength="6">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" onclick="togglePasswordVisibility(this, 'senha_login')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    <div class="text-end mt-2">
-                                        <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
-                                    </div>
-                                </div>
+                                  <label for="senha_login" class="form-label">Senha</label>
+                                  <div class="input-group">
+                                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                      <input type="password" id="senha_login" class="form-control" name="senha_login" required minlength="6">
+                                      <span class="input-group-text" style="cursor:pointer;" onclick="togglePasswordVisibility(this, 'senha_login')">
+                                          <i class="fas fa-eye"></i>
+                                      </span>
+                                  </div>
+                                  <div class="text-end mt-2">
+                                      <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
+                                  </div>
+                              </div>
+
+
 
                                 <div class="mt-3 text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" onclick="document.getElementById('formAgendamento').submit();">
+                                    <button type="submit" class="btn btn-primary btn-signup btn-lg px-5 py-2" onclick="document.getElementById('formAgendamento').submit();">
                                         <i class="fas fa-sign-in-alt me-2"></i>Login e Agendar
                                     </button>
 
