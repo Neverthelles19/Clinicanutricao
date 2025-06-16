@@ -164,33 +164,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // After successful registration, the session variables are set in cadastrarCliente
             } else {
                 // Login
-                $login = trim($_POST['email_cliente_login'] ?? ''); // Pode ser email ou telefone
+                $email = trim($_POST['email_cliente_login'] ?? ''); // Use specific names
                 $senha = $_POST['senha_login'] ?? '';
 
-                if (empty($login) || empty($senha)) {
-                    throw new Exception('Por favor, insira seu e-mail ou telefone e senha para fazer login.');
+                if (empty($email) || empty($senha)) {
+                    throw new Exception('Por favor, insira seu e-mail e senha para fazer login.');
                 }
 
-                // Verificar se o login é um email ou telefone
-                $is_email = filter_var($login, FILTER_VALIDATE_EMAIL);
-                
-                if ($is_email) {
-                    // Login com email
-                    $cliente = buscarClientePorEmail($conexao, $login);
-                } else {
-                    // Login com telefone
-                    $stmt = $conexao->prepare("SELECT id, nome, email, telefone, senha FROM clientes WHERE telefone = ? LIMIT 1");
-                    if (!$stmt) {
-                        throw new Exception("Erro ao preparar consulta do cliente: {$conexao->error}");
-                    }
-                    $stmt->bind_param("s", $login);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $cliente = $result->fetch_assoc();
-                }
-                
+                $cliente = buscarClientePorEmail($conexao, $email);
                 if (!$cliente || !password_verify($senha, $cliente['senha'])) {
-                    throw new Exception('Login ou senha incorretos.');
+                    throw new Exception('E-mail ou senha incorretos.');
                 }
                 
                 // Set session variables upon successful login
@@ -227,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['mensagem'] = 'Agendamento realizado com sucesso!';
         $_SESSION['tipo_mensagem'] = 'success';
-        header('Location: index.php'); // Redirect to avoid resubmission
+        header('Location: .php'); // Redirect to avoid resubmission
         exit;
 
     } catch (Exception $e) {
@@ -584,7 +567,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <strong>Você está logado como:</strong> ${nomeCliente} (${emailCliente})
                             </div>
                             <div class="d-grid mb-4">
-                                <button type="submit" class="btn btn-primary btn-lg" onclick="document.getElementById('formAgendamento').submit();">
+                                <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="fas fa-calendar-check me-2"></i>Confirmar Agendamento
                                 </button>
                             </div>
@@ -622,7 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 </script>
 
-                <form method="POST" action="index.php" id="formAgendamento" style="display: none;">
+                <form method="POST" id="formAgendamento" style="display: none;">
                     <input type="hidden" name="servico_id" id="inputServicoId">
                     <input type="hidden" name="profissional_id" id="inputProfissionalId">
                     <input type="hidden" name="data" id="inputData">
@@ -673,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                         <input type="password" id="senha_cadastro" class="form-control" name="senha_cadastro" required minlength="6">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" onclick="togglePasswordVisibility(this, 'senha_cadastro')">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -681,7 +664,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <div class="text-center mt-4">
                                     <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="text-primary">Faça Login</a></p>
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2">
                                         <i class="fas fa-user-plus me-2"></i>Cadastrar e Agendar
                                     </button>
                                 </div>
@@ -698,10 +681,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="login-body p-4">
                                 <div class="mb-3">
-                                    <label for="email_cliente_login" class="form-label">E-mail ou Telefone</label>
+                                    <label for="email_cliente_login" class="form-label">E-mail</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" name="email_cliente_login" class="form-control" id="email_cliente_login" required>
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" name="email_cliente_login" class="form-control" id="email_cliente_login" required>
                                     </div>
                                 </div>
 
@@ -710,7 +693,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                         <input type="password" id="senha_login" class="form-control" name="senha_login" required minlength="6">
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" onclick="togglePasswordVisibility(this, 'senha_login')">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -720,7 +703,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
 
                                 <div class="mt-3 text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" onclick="document.getElementById('formAgendamento').submit();">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2">
                                         <i class="fas fa-sign-in-alt me-2"></i>Login e Agendar
                                     </button>
 
@@ -871,27 +854,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('isCadastroForm').value = '0';
         });
 
-        // Função para alternar a visibilidade da senha
-        function togglePasswordVisibility(button, inputId) {
-            const input = document.getElementById(inputId) || button.parentElement.querySelector('input');
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-        
         // Event listeners para o botão de mostrar/esconder senha
         document.querySelectorAll('.toggle-password').forEach(button => {
             button.addEventListener('click', function() {
                 const input = this.parentElement.querySelector('input');
-                togglePasswordVisibility(this);
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
             });
         });
     </script>

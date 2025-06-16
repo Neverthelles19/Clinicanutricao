@@ -5,28 +5,40 @@ include("conexao.php");
 $mensagemErro = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = strtolower(trim($_POST['email']));
+    $login = strtolower(trim($_POST['login'])); // Pode ser email ou telefone
     $senha = $_POST['senha'];
-
-    $stmt = $conexao->prepare("SELECT id, senha FROM adm WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    
+    // Verifica se o login é um email ou telefone
+    $is_email = filter_var($login, FILTER_VALIDATE_EMAIL);
+    
+    if ($is_email) {
+        // Login com email
+        $stmt = $conexao->prepare("SELECT id, nome, email, senha FROM clientes WHERE email = ?");
+        $stmt->bind_param("s", $login);
+    } else {
+        // Login com telefone
+        $stmt = $conexao->prepare("SELECT id, nome, email, senha FROM clientes WHERE telefone = ?");
+        $stmt->bind_param("s", $login);
+    }
+    
     $stmt->execute();
     $resultado = $stmt->get_result();
 
     if ($resultado->num_rows === 1) {
-        $colaborador = $resultado->fetch_assoc();
-        if (password_verify($senha, $colaborador['senha'])) {
-            $_SESSION['colaborador'] = [
-                'id' => $colaborador['id'],
-                'email' => $email
-            ];
-            header("Location: cdfuncionario.php");
+        $cliente = $resultado->fetch_assoc();
+        if (password_verify($senha, $cliente['senha'])) {
+            $_SESSION['cliente_id'] = $cliente['id'];
+            $_SESSION['nome_cliente'] = $cliente['nome'];
+            $_SESSION['email_cliente'] = $cliente['email'];
+            
+            // Redirecionar para a página principal
+            header("Location: index.php");
             exit();
         }
     }
 
     // Se chegou aqui, login falhou
-    $mensagemErro = "E-mail ou senha incorretos. Verifique seus dados e tente novamente.";
+    $mensagemErro = "Login ou senha incorretos. Verifique seus dados e tente novamente.";
 }
 ?>
 <!DOCTYPE html>
@@ -352,10 +364,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       <form method="POST" action="">
         <div class="mb-4">
-          <label for="email" class="form-label">Email</label>
+          <label for="login" class="form-label">Email ou Telefone</label>
           <div class="input-icon-wrapper">
-            <input type="email" name="email" class="form-control" id="email" required>
-            <i class="fas fa-envelope input-icon"></i>
+            <input type="text" name="login" class="form-control" id="login" required>
+            <i class="fas fa-user input-icon"></i>
           </div>
         </div>
 

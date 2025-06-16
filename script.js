@@ -44,6 +44,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializa as instâncias dos modais quando o DOM estiver carregado
     modalAgendamentoInstancia = new bootstrap.Modal(document.getElementById('modalAgendamento'));
     modalConfirmacaoInstancia = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+    
+    // Adiciona evento para fechar os modais quando o botão X é clicado
+    document.querySelectorAll('.btn-close').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        });
+    });
+    
+    // Adiciona evento para fechar os modais quando o botão X é clicado
+    document.querySelectorAll('.btn-close').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        });
+    });
 
     // Efeito nos campos de formulário
     document.querySelectorAll('.form-control').forEach(input => {
@@ -76,6 +98,15 @@ document.addEventListener('DOMContentLoaded', function() {
     linkFazerCadastro.addEventListener('click', function(e) {
         e.preventDefault();
         mostrarFormCadastro();
+    });
+    
+    // Event listeners para os botões de alternância entre cadastro e login
+    document.getElementById('btnCadastro').addEventListener('click', function() {
+        mostrarFormCadastro();
+    });
+    
+    document.getElementById('btnLogin').addEventListener('click', function() {
+        mostrarFormLogin();
     });
 
     // Inicializa o calendário com o offset 0 (mês atual)
@@ -188,6 +219,7 @@ function criarCalendario(mesOffset) {
 
 // Handler para o clique em um dia do calendário
 function handleDayClick(event) {
+    // Verificar se o usuário está logado antes de prosseguir
     const previouslySelected = document.querySelector('.calendario-dia.selecionado');
     if (previouslySelected) {
         previouslySelected.classList.remove('selecionado');
@@ -212,85 +244,46 @@ function handleDayClick(event) {
 // Função assíncrona para carregar horários disponíveis do servidor
 async function carregarHorariosDisponiveis(dataSelecionada) {
     const selectHora = document.getElementById('selectHora');
+    if (!selectHora) {
+        console.error("Elemento selectHora não encontrado!");
+        return;
+    }
+    
     selectHora.innerHTML = '<option value="">Carregando horários...</option>';
-    formAgendamento.style.display = 'none';
-
-    const interval = 60;
-    let horaAtual = horaInicio;
-    const horariosGerados = [];
-
-    while (true) {
-        const [hAtual, mAtual] = horaAtual.split(':').map(Number);
-        const tempoAtual = new Date();
-        tempoAtual.setHours(hAtual, mAtual, 0, 0);
-
-        const [hFim, mFim] = horaFim.split(':').map(Number);
-        const tempoFim = new Date();
-        tempoFim.setHours(hFim, mFim, 0, 0);
-
-        if (tempoAtual.getTime() >= tempoFim.getTime()) {
-            break;
-        }
-
-        horariosGerados.push(horaAtual);
-
-        tempoAtual.setMinutes(tempoAtual.getMinutes() + interval);
-        horaAtual = `${String(tempoAtual.getHours()).padStart(2, '0')}:${String(tempoAtual.getMinutes()).padStart(2, '0')}`;
+    
+    if (formAgendamento) {
+        formAgendamento.style.display = 'none';
     }
 
     try {
-        const response = await fetch(`get_agendamentos.php?profissional_id=${profissionalSelecionadoId}&data=${dataSelecionada}`);
+        // Usar o endpoint horarios_disponiveis.php para obter horários disponíveis
+        const url = `horarios_disponiveis.php?profId=${profissionalSelecionadoId}&data=${dataSelecionada}&servicoId=${servicoSelecionadoId}`;
+        
+        const response = await fetch(url);
+        
         if (!response.ok) {
-            throw new Error(`Erro HTTP ao buscar agendamentos: ${response.status}`);
+            throw new Error(`Erro HTTP ao buscar horários: ${response.status}`);
         }
-        const agendamentosExistentes = await response.json();
-
-        selectHora.innerHTML = '';
-
-        if (horariosGerados.length === 0) {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'Nenhum horário gerado para este profissional.';
-            selectHora.appendChild(option);
-            return;
+        
+        // A resposta já vem formatada como HTML com as opções
+        const htmlOptions = await response.text();
+        
+        selectHora.innerHTML = htmlOptions;
+        
+        // Verificar se há opções válidas
+        const hasValidOptions = Array.from(selectHora.options).some(option => option.value !== '');
+        
+        // Garantir que o evento onchange esteja configurado
+        if (typeof mostrarFormulario === 'function') {
+            selectHora.onchange = mostrarFormulario;
         }
-
-        let horariosDisponiveisParaSelecao = [];
-
-        horariosGerados.forEach(hora => {
-            const agendado = agendamentosExistentes.some(agendamento => agendamento.hora.substring(0, 5) === hora);
-            if (!agendado) {
-                horariosDisponiveisParaSelecao.push(hora);
-            }
-        });
-
-        if (horariosDisponiveisParaSelecao.length > 0) {
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Selecione um horário';
-            selectHora.appendChild(defaultOption);
-
-            horariosDisponiveisParaSelecao.forEach(hora => {
-                const option = document.createElement('option');
-                option.value = hora;
-                option.textContent = hora;
-                selectHora.appendChild(option);
-            });
-        } else {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'Todos os horários estão ocupados para esta data.';
-            selectHora.appendChild(option);
+        
+    } catch (error) {
+        console.error('Erro ao buscar horários disponíveis:', error);
+        selectHora.innerHTML = '<option value="">Erro ao carregar horários. Tente novamente.</option>';
+        if (formAgendamento) {
             formAgendamento.style.display = 'none';
         }
-
-    } catch (error) {
-        console.error('Erro ao buscar agendamentos existentes:', error);
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'Erro ao carregar horários. Tente novamente.';
-        selectHora.appendChild(option);
-        formAgendamento.style.display = 'none';
     }
 }
 
@@ -336,6 +329,10 @@ document.getElementById('selectProfissional').addEventListener('change', functio
 function mostrarFormCadastro() {
     formCadastro.style.display = 'block';
     formLogin.style.display = 'none';
+    
+    // Atualiza os botões de alternância
+    document.getElementById('btnCadastro').classList.add('active');
+    document.getElementById('btnLogin').classList.remove('active');
 
     nomeClienteCadastro.setAttribute('required', 'required');
     emailClienteCadastro.setAttribute('required', 'required');
@@ -349,12 +346,19 @@ function mostrarFormCadastro() {
 
     emailClienteLogin.value = '';
     senhaLogin.value = '';
+    
+    // Define o valor do campo hidden para indicar que é um cadastro
+    document.getElementById('isCadastroForm').value = '1';
 }
 
 // Função para mostrar o formulário de login e ocultar o de cadastro
 function mostrarFormLogin() {
     formLogin.style.display = 'block';
     formCadastro.style.display = 'none';
+    
+    // Atualiza os botões de alternância
+    document.getElementById('btnCadastro').classList.remove('active');
+    document.getElementById('btnLogin').classList.add('active');
 
     emailClienteLogin.setAttribute('required', 'required');
     senhaLogin.setAttribute('required', 'required');
@@ -368,10 +372,17 @@ function mostrarFormLogin() {
     emailClienteCadastro.value = '';
     telefoneClienteCadastro.value = '';
     senhaCadastro.value = '';
+    
+    // Define o valor do campo hidden para indicar que é um login
+    document.getElementById('isCadastroForm').value = '0';
 }
 
 // Função para pré-preencher dados do cliente logado e desabilitar campos
 function preencherDadosClienteLogado(nome, email, telefone) {
+    // Limpar campos primeiro para garantir que não haja dados de sessões anteriores
+    limparCamposFormulario();
+    
+    // Preencher com os dados do usuário logado
     nomeClienteCadastro.value = nome;
     emailClienteCadastro.value = email;
     telefoneClienteCadastro.value = telefone;
@@ -412,36 +423,7 @@ function formatarTelefoneInput(inputElement) {
     });
 }
 
-// Event listener para a seleção de horário no SEGUNDO MODAL (de confirmação)
-document.getElementById('selectHora').addEventListener('change', function() {
-    horaSelecionadaGlobal = this.value;
-    inputHora.value = horaSelecionadaGlobal;
-
-    if (this.value) {
-        formAgendamento.style.display = 'block';
-
-        // Aqui, chamamos uma função auxiliar que será definida globalmente (ou por PHP)
-        // para decidir qual formulário mostrar e se deve pré-preencher.
-        // `handleLoginStatusAndFormDisplay` é uma função que você adicionará globalmente
-        // OU, como discutimos, a lógica do PHP que chama `preencherDadosClienteLogado`
-        // e `mostrarFormCadastro/Login` deve estar na sua página principal.
-        // Para que o script seja totalmente separado, `handleLoginStatusAndFormDisplay`
-        // precisa ser definida **fora** deste arquivo JS, na sua página PHP,
-        // ou você fará uma chamada AJAX para verificar o status de login.
-        // Vamos manter a abordagem do PHP que imprime o JS no HTML principal por simplicidade.
-        // O código abaixo será a **única exceção** de JS que fica na página PHP.
-        if (typeof checkAndSetLoginStatus === 'function') {
-            checkAndSetLoginStatus(); // Esta função virá do PHP
-        } else {
-            mostrarFormCadastro(); // Fallback se a função do PHP não estiver disponível
-        }
-
-    } else {
-        formAgendamento.style.display = 'none';
-        formCadastro.style.display = 'none';
-        formLogin.style.display = 'none';
-    }
-});
+// Remover este event listener já que agora usamos a função mostrarFormulario() diretamente no HTML
 
 
 // Event listener para os botões "Agendar Agora" nos cards de serviço
@@ -467,29 +449,53 @@ document.querySelectorAll('.agendarBtn').forEach(btn => {
         inputHora.value = '';
         horaSelecionadaGlobal = null;
 
-        nomeClienteCadastro.value = '';
-        emailClienteCadastro.value = '';
-        telefoneClienteCadastro.value = '';
-        senhaCadastro.value = '';
-        emailClienteLogin.value = '';
-        senhaLogin.value = '';
-
-        linkFazerLogin.style.display = 'inline';
-        linkFazerCadastro.style.display = 'inline';
-
-        nomeClienteCadastro.removeAttribute('readonly');
-        emailClienteCadastro.removeAttribute('readonly');
-        telefoneClienteCadastro.removeAttribute('readonly');
-        senhaCadastro.setAttribute('required', 'required');
-        senhaCadastro.style.display = 'block';
-
-        formAgendamento.style.display = 'none';
-        formCadastro.style.display = 'none';
-        formLogin.style.display = 'none';
+        // Limpar todos os campos de formulário
+        limparCamposFormulario();
 
         modalAgendamentoInstancia.show();
     });
 });
+
+// Função para limpar todos os campos de formulário
+function limparCamposFormulario() {
+    try {
+        // Limpar campos de cadastro se existirem
+        if (nomeClienteCadastro) nomeClienteCadastro.value = '';
+        if (emailClienteCadastro) emailClienteCadastro.value = '';
+        if (telefoneClienteCadastro) telefoneClienteCadastro.value = '';
+        if (senhaCadastro) senhaCadastro.value = '';
+        
+        // Limpar campos de login se existirem
+        if (emailClienteLogin) emailClienteLogin.value = '';
+        if (senhaLogin) senhaLogin.value = '';
+
+        // Resetar atributos se os elementos existirem
+        if (nomeClienteCadastro) nomeClienteCadastro.removeAttribute('readonly');
+        if (emailClienteCadastro) emailClienteCadastro.removeAttribute('readonly');
+        if (telefoneClienteCadastro) telefoneClienteCadastro.removeAttribute('readonly');
+        if (senhaCadastro) {
+            senhaCadastro.setAttribute('required', 'required');
+            senhaCadastro.style.display = 'block';
+        }
+
+        // Mostrar links de alternância se existirem
+        if (linkFazerLogin) linkFazerLogin.style.display = 'inline';
+        if (linkFazerCadastro) linkFazerCadastro.style.display = 'inline';
+
+        // Ocultar formulários se existirem
+        if (formAgendamento) formAgendamento.style.display = 'none';
+        if (formCadastro) formCadastro.style.display = 'none';
+        if (formLogin) formLogin.style.display = 'none';
+        
+        // Remover qualquer mensagem de usuário logado que possa existir
+        if (formAgendamento) {
+            const alertasExistentes = formAgendamento.querySelectorAll('.alert');
+            alertasExistentes.forEach(alerta => alerta.remove());
+        }
+    } catch (error) {
+        console.error("Erro ao limpar campos:", error);
+    }
+}
 
 document.getElementById('selectProfissional').addEventListener('change', function() {
     inputProfissionalId.value = this.value;
