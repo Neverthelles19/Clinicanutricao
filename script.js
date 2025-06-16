@@ -219,6 +219,14 @@ function criarCalendario(mesOffset) {
 
 // Handler para o clique em um dia do calendário
 function handleDayClick(event) {
+    // Limpar todos os campos do formulário
+    if (document.getElementById('nome_cliente_cadastro')) document.getElementById('nome_cliente_cadastro').value = '';
+    if (document.getElementById('telefone_cliente_cadastro')) document.getElementById('telefone_cliente_cadastro').value = '';
+    if (document.getElementById('email_cliente_cadastro')) document.getElementById('email_cliente_cadastro').value = '';
+    if (document.getElementById('senha_cadastro')) document.getElementById('senha_cadastro').value = '';
+    if (document.getElementById('email_cliente_login')) document.getElementById('email_cliente_login').value = '';
+    if (document.getElementById('senha_login')) document.getElementById('senha_login').value = '';
+    
     // Verificar se o usuário está logado antes de prosseguir
     const previouslySelected = document.querySelector('.calendario-dia.selecionado');
     if (previouslySelected) {
@@ -290,6 +298,14 @@ async function carregarHorariosDisponiveis(dataSelecionada) {
 // Event listener para a seleção de profissional no PRIMEIRO MODAL
 document.getElementById('selectProfissional').addEventListener('change', function() {
     const profissionalSelecionadoOption = this.options[this.selectedIndex];
+
+    // Limpar todos os campos do formulário
+    if (document.getElementById('nome_cliente_cadastro')) document.getElementById('nome_cliente_cadastro').value = '';
+    if (document.getElementById('telefone_cliente_cadastro')) document.getElementById('telefone_cliente_cadastro').value = '';
+    if (document.getElementById('email_cliente_cadastro')) document.getElementById('email_cliente_cadastro').value = '';
+    if (document.getElementById('senha_cadastro')) document.getElementById('senha_cadastro').value = '';
+    if (document.getElementById('email_cliente_login')) document.getElementById('email_cliente_login').value = '';
+    if (document.getElementById('senha_login')) document.getElementById('senha_login').value = '';
 
     if (profissionalSelecionadoOption.value) {
         diasAtendimentoProfissional = JSON.parse(profissionalSelecionadoOption.getAttribute('data-dias'));
