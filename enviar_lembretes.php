@@ -1,6 +1,9 @@
 <?php
 include 'conexao.php';
 
+// Incluir a configuração do PHPMailer
+require_once 'phpmailer_config.php';
+
 // Função para enviar email
 function enviarEmailLembrete($email, $nome, $data, $hora, $tipo) {
     $to = $email;
@@ -17,10 +20,22 @@ function enviarEmailLembrete($email, $nome, $data, $hora, $tipo) {
                  . "Atenciosamente,\nClínica de Nutrição";
     }
     
-    $headers = "From: contato@seudominio.com\r\n";
-
-    // Envia o e-mail
-    mail($to, $subject, $message, $headers);
+    // Tentar enviar usando PHPMailer primeiro
+    $result = enviarEmailPHPMailer($to, $subject, $message);
+    
+    // Se falhar com PHPMailer, tenta com a função mail() nativa
+    if (!$result) {
+        $headers = "From: contato@seudominio.com\r\n";
+        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        
+        $result = mail($to, $subject, $message, $headers);
+        
+        // Registra o resultado em log
+        $log_message = date('Y-m-d H:i:s') . " - Envio para {$email} (mail nativo): " . ($result ? "Sucesso" : "Falha") . "\n";
+        file_put_contents('email_log.txt', $log_message, FILE_APPEND);
+    }
+    
+    return $result;
 }
 
 // 1. Busca agendamentos para o dia seguinte

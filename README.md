@@ -1,28 +1,60 @@
-# Clínica Nutrição - Sistema de Agendamento
+# Clínica Nutrição - Sistema de Agendamentos
 
-## Configuração do Login com Google
+## Configuração do Envio de E-mails
 
-Para configurar o login com Google, siga os passos abaixo:
+Para que o sistema de envio de lembretes por e-mail funcione corretamente, siga estas instruções:
 
-1. Acesse o [Google Cloud Console](https://console.cloud.google.com/)
-2. Crie um novo projeto ou selecione um existente
-3. Vá para "APIs e Serviços" > "Credenciais"
-4. Clique em "Criar Credenciais" > "ID do Cliente OAuth"
-5. Configure a tela de consentimento OAuth
-6. Crie um ID de cliente para aplicativo Web
-7. Adicione a URL de redirecionamento: `http://localhost/Clinicanutricao/oauth/google/callback.php`
-8. Copie o Client ID e Client Secret
+### Opção 1: Usando PHPMailer (Recomendado)
 
-Edite o arquivo `oauth/google/config.php` e substitua:
-- `$googleClientID` com seu Client ID
-- `$googleClientSecret` com seu Client Secret
+1. Instale o PHPMailer via Composer:
+   ```
+   composer require phpmailer/phpmailer
+   ```
 
-## Instalação das Dependências
+2. Edite o arquivo `phpmailer_config.php` e configure com seus dados de SMTP:
+   ```php
+   $smtp_server = 'smtp.seudominio.com'; // Seu servidor SMTP
+   $smtp_port = 587; // Porta do servidor SMTP
+   $smtp_username = 'seu_email@seudominio.com'; // Seu e-mail
+   $smtp_password = 'sua_senha'; // Sua senha
+   $smtp_secure = 'tls'; // tls ou ssl
+   ```
 
-Execute o comando abaixo na pasta raiz do projeto:
+3. Teste o envio de e-mails executando:
+   ```
+   php test_phpmailer.php
+   ```
 
-```
-composer install
-```
+### Opção 2: Usando a função mail() nativa do PHP
 
-Isso instalará a biblioteca do Google API Client necessária para o login com Google.
+1. Edite o arquivo `smtp_config.php` e configure com seus dados de SMTP:
+   ```php
+   ini_set('SMTP', 'smtp.seudominio.com');
+   ini_set('smtp_port', 587);
+   ini_set('sendmail_from', 'contato@seudominio.com');
+   ```
+
+2. Teste o envio de e-mails executando:
+   ```
+   php test_email.php
+   ```
+
+### Configuração do Agendador de Tarefas
+
+Para enviar lembretes automaticamente:
+
+#### No Windows (Task Scheduler):
+1. Abra o Task Scheduler
+2. Crie uma nova tarefa
+3. Configure para executar: `C:\xampp\php\php.exe -f C:\xampp\htdocs\Clinicanutricao\cron_lembretes.php`
+4. Defina para executar a cada hora
+
+#### No Linux (Cron):
+1. Edite o crontab: `crontab -e`
+2. Adicione: `0 * * * * php /caminho/para/Clinicanutricao/cron_lembretes.php`
+
+## Logs
+
+O sistema mantém dois arquivos de log:
+- `lembretes_log.txt`: Registra quando o script de lembretes foi executado
+- `email_log.txt`: Registra o resultado de cada tentativa de envio de e-mail

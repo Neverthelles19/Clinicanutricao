@@ -1,7 +1,7 @@
 <?php
 // Configurações do Google OAuth
-$googleClientID = '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com'; // Substitua pelo seu Client ID
-$googleClientSecret = 'GOCSPX-abcdefghijklmnopqrstuvwxyz'; // Substitua pelo seu Client Secret
+$googleClientID = '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com'; // Substitua pelo seu Client ID real
+$googleClientSecret = 'GOCSPX-abcdefghijklmnopqrstuvwxyz'; // Substitua pelo seu Client Secret real
 $googleRedirectURL = 'http://localhost/Clinicanutricao/oauth/google/callback.php';
 
 // Inicia a sessão se não estiver iniciada

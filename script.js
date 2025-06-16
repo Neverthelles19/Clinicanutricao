@@ -7,6 +7,7 @@ let servicoSelecionadoId = null;
 let profissionalSelecionadoId = null; // Inicialmente nulo, pois nenhum profissional está selecionado
 let nomeServico = '';
 let nomeProfissional = '';
+let valorServico = '';
 let dataSelecionadaGlobal = null;
 let horaSelecionadaGlobal = null; // Variável para armazenar a hora selecionada
 
@@ -55,17 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Adiciona evento para fechar os modais quando o botão X é clicado
-    document.querySelectorAll('.btn-close').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const modal = this.closest('.modal');
-            const modalInstance = bootstrap.Modal.getInstance(modal);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-        });
-    });
 
     // Efeito nos campos de formulário
     document.querySelectorAll('.form-control').forEach(input => {
@@ -87,27 +77,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Aplica a formatação de telefone aos campos de telefone
-    formatarTelefoneInput(telefoneClienteCadastro);
+    if (telefoneClienteCadastro) {
+        formatarTelefoneInput(telefoneClienteCadastro);
+    }
 
     // Event Listeners para alternar entre login e cadastro dentro do MODAL DE CONFIRMAÇÃO
-    linkFazerLogin.addEventListener('click', function(e) {
-        e.preventDefault();
-        mostrarFormLogin();
-    });
+    if (linkFazerLogin) {
+        linkFazerLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            mostrarFormLogin();
+        });
+    }
 
-    linkFazerCadastro.addEventListener('click', function(e) {
-        e.preventDefault();
-        mostrarFormCadastro();
-    });
+    if (linkFazerCadastro) {
+        linkFazerCadastro.addEventListener('click', function(e) {
+            e.preventDefault();
+            mostrarFormCadastro();
+        });
+    }
     
     // Event listeners para os botões de alternância entre cadastro e login
-    document.getElementById('btnCadastro').addEventListener('click', function() {
-        mostrarFormCadastro();
-    });
+    if (document.getElementById('btnCadastro')) {
+        document.getElementById('btnCadastro').addEventListener('click', function() {
+            mostrarFormCadastro();
+        });
+    }
     
-    document.getElementById('btnLogin').addEventListener('click', function() {
-        mostrarFormLogin();
-    });
+    if (document.getElementById('btnLogin')) {
+        document.getElementById('btnLogin').addEventListener('click', function() {
+            mostrarFormLogin();
+        });
+    }
 
     // Inicializa o calendário com o offset 0 (mês atual)
     criarCalendario(mesAtualOffset);
@@ -240,6 +240,7 @@ function handleDayClick(event) {
 
     document.getElementById('confirmServico').textContent = nomeServico;
     document.getElementById('confirmProfissional').textContent = nomeProfissional;
+    document.getElementById('valorServico').textContent = valorServico;
     const dataExibicaoFormatada = new Date(dataSelecionadaGlobal + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     document.getElementById('confirmData').textContent = dataExibicaoFormatada;
 
@@ -416,6 +417,8 @@ function preencherDadosClienteLogado(nome, email, telefone) {
 
 // Função para formatar o telefone enquanto o usuário digita (aplicada a qualquer input de telefone)
 function formatarTelefoneInput(inputElement) {
+    if (!inputElement) return;
+    
     inputElement.addEventListener('input', function (e) {
         let value = e.target.value.replace(/\D/g, '');
         let formattedValue = '';
@@ -439,14 +442,12 @@ function formatarTelefoneInput(inputElement) {
     });
 }
 
-// Remover este event listener já que agora usamos a função mostrarFormulario() diretamente no HTML
-
-
 // Event listener para os botões "Agendar Agora" nos cards de serviço
 document.querySelectorAll('.agendarBtn').forEach(btn => {
     btn.addEventListener('click', function() {
         servicoSelecionadoId = this.getAttribute('data-id');
         nomeServico = this.getAttribute('data-servico');
+        valorServico = this.getAttribute('data-valor');
 
         document.getElementById('nomeServicoModal').textContent = nomeServico;
         inputServicoId.value = servicoSelecionadoId;
@@ -512,10 +513,6 @@ function limparCamposFormulario() {
         console.error("Erro ao limpar campos:", error);
     }
 }
-
-document.getElementById('selectProfissional').addEventListener('change', function() {
-    inputProfissionalId.value = this.value;
-});
 
 // Função para alternar a visibilidade da senha
 function togglePasswordVisibility(icon, inputId) {

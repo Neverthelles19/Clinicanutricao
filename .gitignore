@@ -1,0 +1,18 @@
+# Dependências do Composer
+/vendor/
+/composer.lock
+
+# Arquivos de log
+*.log
+email_log.txt
+lembretes_log.txt
+
+# Arquivos de configuração com credenciais
+smtp_config.php
+
+# Arquivos de ambiente
+.env
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

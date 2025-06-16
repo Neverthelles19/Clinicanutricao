@@ -273,9 +273,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="index.php" class="btn btn-sm rounded-pill px-3 me-2 btn-inicio">
                         <i class="fas fa-home me-1"></i> Início
                     </a>
+                    <?php if (isset($_SESSION['cliente_id'])): ?>
+                    <a href="meus_agendamentos.php" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
+                        <i class="fas fa-calendar-alt me-1"></i> Meus Agendamentos
+                    </a>
                     <a href="logout.php" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
                         <i class="fas fa-sign-out-alt me-1"></i> Sair
                     </a>
+                    <?php else: ?>
+                    <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fas fa-sign-in-alt me-1"></i> Entrar
+                    </a>
+                    <a href="oauth/google/logingoogle.php" class="btn btn-sm btn-danger rounded-pill px-3">
+                        <i class="fab fa-google me-1"></i> Entrar com Google
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>
@@ -446,7 +458,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="mt-3 mt-md-0">
                                             <button type="button" class="btn btn-outline-primary agendarBtn"
                                                     data-id="<?= $s['id'] ?>"
-                                                    data-servico="<?= htmlspecialchars($s['servico']) ?>">
+                                                    data-servico="<?= htmlspecialchars($s['servico']) ?>"
+                                                    data-valor="<?= number_format($s['valor'], 2, ',', '.') ?>">
                                                 Agendar Agora
                                             </button>
                                         </div>
@@ -533,9 +546,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="text-muted small">Profissional</span><br>
                         <span id="confirmProfissional" class="fw-semibold text-dark"></span>
                     </li>
-                    <li>
+                    <li class="mb-3">
                         <span class="text-muted small">Data</span><br>
                         <span id="confirmData" class="fw-semibold text-dark"></span>
+                    </li>
+                    <li class="mb-3">
+                        <span class="text-muted small">Valor</span><br>
+                        <span id="confirmValor" class="fw-semibold text-primary fs-5">R$ <span id="valorServico"></span></span>
                     </li>
                 </ul>
 
@@ -645,134 +662,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div id="formCadastro" class="signup-container">
-                        <div class="signup-card">
-                            <div class="signup-header bg-primary text-white p-4 rounded-top">
-                                <h2 class="mb-0"><i class="fas fa-user-plus me-2"></i>Cadastro</h2>
-                                <p class="text-white-50 mt-2 mb-0">Crie sua conta para agendar:</p>
-                            </div>
-
-                            <div class="signup-body p-4">
-                                <div class="mb-3">
-                                    <label for="nome_cliente_cadastro" class="form-label">Seu Nome Completo</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" class="form-control" name="nome_cliente_cadastro" id="nome_cliente_cadastro" placeholder="Nome Sobrenome" required>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="telefone_cliente_cadastro" class="form-label">Telefone (com DDD)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="tel" class="form-control" name="telefone_cliente_cadastro" id="telefone_cliente_cadastro" placeholder="(XX) XXXXX-XXXX" pattern="\(\d{2}\) \d{4,5}-\d{4}" required>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="email_cliente_cadastro" class="form-label">E-mail</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" class="form-control" name="email_cliente_cadastro" id="email_cliente_cadastro" placeholder="seu.email@exemplo.com" required>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                  <label for="senha_cadastro" class="form-label">Crie sua Senha</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                      <input type="password" id="senha_cadastro" class="form-control" name="senha_cadastro" required minlength="6">
-                                      <span class="input-group-text" style="cursor:pointer;" onclick="togglePasswordVisibility(this, 'senha_cadastro')">
-                                          <i class="fas fa-eye"></i>
-                                      </span>
-                                  </div>
-                              </div>
-<div class="text-center mt-4">
-                                    <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="text-primary">Faça Login</a></p>
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
-                                        <i class="fas fa-user-plus me-2"></i>Cadastrar e Agendar
-                                    </button>
-                                    
-                                    <div class="position-relative my-4">
-                                        <hr>
-                                        <span class="position-absolute top-0 start-50 translate-middle bg-white px-3 text-muted">ou</span>
-                                    </div>
-                                    
-                                    <div class="d-grid">
-                                        <a href="oauth/google/logingoogle.php" class="btn btn-outline-danger d-flex align-items-center justify-content-center">
-                                            <i class="fab fa-google me-2"></i> Cadastrar com Google
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                                <div class="text-center mt-4">
-                                    <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="text-primary">Faça Login</a></p>
-                                    <button type="submit" class="btn btn-primary btn-signup btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
-                                        <i class="fas fa-user-plus me-2"></i>Cadastrar e Agendar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <?php include 'cadastro_form.php'; ?>
                     </div>
 
                     <div id="formLogin" class="login-container" style="display: none;">
-                        <div class="login-card">
-                            <div class="login-header bg-primary text-white p-4 rounded-top">
-                                <h2 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Login</h2>
-                                <p class="text-white-50 mt-2 mb-0">Bem-vindo(a) ao sistema</p>
-                            </div>
-
-                            <div class="login-body p-4">
-                                <div class="mb-3">
-                                    <label for="email_cliente_login" class="form-label">E-mail ou Telefone</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" name="email_cliente_login" class="form-control" id="email_cliente_login" required>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                  <label for="senha_login" class="form-label">Senha</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                      <input type="password" id="senha_login" class="form-control" name="senha_login" required minlength="6">
-                                      <span class="input-group-text" style="cursor:pointer;" onclick="togglePasswordVisibility(this, 'senha_login')">
-                                          <i class="fas fa-eye"></i>
-                                      </span>
-                                  </div>
-                                  <div class="text-end mt-2">
-                                      <a href="recuperar_senha.php" class="small text-muted">Esqueceu sua senha?</a>
-                                  </div>
-                              </div>
-
-
-
-                                <div class="mt-3 text-center">
-                                    <button type="submit" class="btn btn-primary btn-signup btn-lg px-5 py-2" onclick="document.getElementById('formAgendamento').submit();">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Login e Agendar
-                                    </button>
-
-                                    <div class="position-relative my-4">
-                                        <hr>
-                                        <span class="position-absolute top-0 start-50 translate-middle bg-white px-3 text-muted">ou</span>
-                                    </div>
-
-                                    <div class="d-grid gap-2">
-                                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
-                                            <i class="fab fa-google me-2"></i> Entrar com Google
-                                        </a>
-                                        <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
-                                            <i class="fab fa-facebook-f me-2"></i> Entrar com Facebook
-                                        </a>
-                                    </div>
-
-                                    <p class="mt-4">Não tem cadastro? <a href="#" id="linkFazerCadastro" class="text-primary">Cadastre-se</a></p>
-                                </div>
-                            </div>
-                        </div>
+                        <?php include 'login_form.php'; ?>
                     </div>
                 </form>
             </div>
