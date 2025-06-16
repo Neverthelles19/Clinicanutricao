@@ -556,7 +556,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     // Atualizar campo oculto
                     document.getElementById('inputHora').value = horaSelecionada;
-                    
+                    // Limpar todos os campos do formulário
+                    document.getElementById('nome_cliente_cadastro').value = '';
+                    document.getElementById('telefone_cliente_cadastro').value = '';
+                    document.getElementById('email_cliente_cadastro').value = '';
+                    document.getElementById('senha_cadastro').value = '';
+                    document.getElementById('email_cliente_login').value = '';
+                    document.getElementById('senha_login').value = '';
+
+
                     if (horaSelecionada && horaSelecionada !== '') {
                         // Mostrar o formulário
                         formAgendamento.style.display = 'block';
@@ -678,6 +686,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       </span>
                                   </div>
                               </div>
+<div class="text-center mt-4">
+                                    <p class="mt-4">Já tem cadastro? <a href="#" id="linkFazerLogin" class="text-primary">Faça Login</a></p>
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-2" id="btnCadastrarAgendar" onclick="document.getElementById('formAgendamento').submit();">
+                                        <i class="fas fa-user-plus me-2"></i>Cadastrar e Agendar
+                                    </button>
+                                    
+                                    <div class="position-relative my-4">
+                                        <hr>
+                                        <span class="position-absolute top-0 start-50 translate-middle bg-white px-3 text-muted">ou</span>
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <a href="oauth/google/logingoogle.php" class="btn btn-outline-danger d-flex align-items-center justify-content-center">
+                                            <i class="fab fa-google me-2"></i> Cadastrar com Google
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
 
                                 <div class="text-center mt-4">
@@ -777,10 +805,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * Função chamada pelo script.js para verificar o status de login do cliente.
          * Se o cliente estiver logado, preenche os campos do formulário e esconde as opções de login/cadastro.
          */
-        function checkAndSetLoginStatus() {
-            // Remover qualquer alerta existente para evitar duplicação
-            const alertasExistentes = document.querySelectorAll('#formAgendamento .alert');
-            alertasExistentes.forEach(alerta => alerta.remove());
+
+            function checkAndSetLoginStatus() {
+            // Limpar todos os campos do formulário
+            if (document.getElementById('nome_cliente_cadastro')) document.getElementById('nome_cliente_cadastro').value = '';
+            if (document.getElementById('telefone_cliente_cadastro')) document.getElementById('telefone_cliente_cadastro').value = '';
+            if (document.getElementById('email_cliente_cadastro')) document.getElementById('email_cliente_cadastro').value = '';
+            if (document.getElementById('senha_cadastro')) document.getElementById('senha_cadastro').value = '';
+            if (document.getElementById('email_cliente_login')) document.getElementById('email_cliente_login').value = '';
+            if (document.getElementById('senha_login')) document.getElementById('senha_login').value = '';
             
             <?php if (isset($_SESSION['cliente_id'])): ?>
                 // Cliente está logado: Preenche os dados e desabilita/oculta os formulários de login/cadastro
