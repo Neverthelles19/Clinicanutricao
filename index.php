@@ -599,7 +599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         document.querySelector('.btn-group').style.display = 'none';
                         
                         // Remover alertas existentes
-                        const alertasExistentes = formAgendamento.querySelectorAll('.alert');
+                     const alertasExistentes: formAgendamento.querySelectorAll('.alert');
                         alertasExistentes.forEach(alerta => alerta.remove());
                         
                         // Adicionar mensagem de usuário logado
